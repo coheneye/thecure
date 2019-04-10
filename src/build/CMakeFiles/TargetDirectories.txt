@@ -1,0 +1,3 @@
+/home/woo/proj/cpp/thecure/src/build/CMakeFiles/edit_cache.dir
+/home/woo/proj/cpp/thecure/src/build/CMakeFiles/rebuild_cache.dir
+/home/woo/proj/cpp/thecure/src/build/CMakeFiles/thecure.dir

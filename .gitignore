@@ -1,0 +1,11 @@
+*.exe
+*.dll
+*.lib
+*.o
+*.so
+*.a
+
+build/*
+bin/*
+!bin/lua
+.vscode/*
