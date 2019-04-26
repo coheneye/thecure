@@ -27,6 +27,7 @@ protected:
     std::string m_data;
 };
 
+
 // main
 int
 main(int argc, char** argv)
