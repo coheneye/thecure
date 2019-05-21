@@ -4,7 +4,7 @@ project(thecure)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-include_directories(./third_party/ ./utils/)
+include_directories(./third_party/ ./utils/ ./hub/)
 
 add_compile_options(-std=c++11)
 
@@ -20,11 +20,12 @@ add_subdirectory(third_party)
 # Add utils
 add_subdirectory(utils)
 
+add_subdirectory(hub)
 # build main
 add_executable(thecure ${DIR_SRCS})
 
 # link lua.lib
 # target_link_libraries(thecure liblua.a dl)
-target_link_libraries(thecure libluajit-5.1.so dl third_party utils)
+target_link_libraries(thecure libluajit-5.1.so dl third_party utils hub)
 # add_library(thecure SHARED ${DIR_SRCS})
 #install(TARGETS thecure DESTINATION /usr/local/lib)
