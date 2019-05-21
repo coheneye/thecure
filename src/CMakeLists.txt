@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.5.2)
 
 project(thecure)
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
-include_directories(./third_party/)
+include_directories(./third_party/ ./utils/)
 
 add_compile_options(-std=c++11)
 
@@ -12,12 +12,19 @@ add_compile_options(-std=c++11)
 
 aux_source_directory(${PROJECT_SOURCE_DIR} DIR_SRCS)
 
-MESSAGE(STATUS "output" ${PROJECT_SOURCE_DIR})
+MESSAGE(STATUS "output" ${DIR_SRCS})
 
+# Add third_party
+add_subdirectory(third_party)
+
+# Add utils
+add_subdirectory(utils)
+
+# build main
 add_executable(thecure ${DIR_SRCS})
 
 # link lua.lib
 # target_link_libraries(thecure liblua.a dl)
-target_link_libraries(thecure libluajit-5.1.a dl)
+target_link_libraries(thecure libluajit-5.1.so dl third_party utils)
 # add_library(thecure SHARED ${DIR_SRCS})
 #install(TARGETS thecure DESTINATION /usr/local/lib)

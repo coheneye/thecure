@@ -1,10 +1,12 @@
 libuv
 nanomsg
 protobuf
-msgpack
 lua=5.1
 LuaBridge
 libzookeeper
 hiredis
-libkafka
 sodium
+cjson
+
+http_parser
+ws_parser

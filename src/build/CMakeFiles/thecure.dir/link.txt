@@ -1,1 +1,0 @@
-/usr/bin/c++   -O3 -DNDEBUG   CMakeFiles/thecure.dir/main.cc.o  -o thecure -rdynamic -Wl,-Bstatic -lluajit-5.1 -Wl,-Bdynamic -ldl 
