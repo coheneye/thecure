@@ -48,7 +48,7 @@ int AsyncRedis::connect(const char* ip, int port)
 void AsyncRedis::close()
 {
     m_closing = true;
-    
+
     redisAsyncDisconnect(m_ctx);
     redisAsyncFree(m_ctx);
 }
@@ -56,7 +56,7 @@ void AsyncRedis::close()
 
 int AsyncRedis::exec(const char* command)
 {
-    int err = redisAsyncCommand(m_ctx, on_command, 0, command);
+    int err = redisAsyncCommand(m_ctx, on_command, (void*)this, command);
     if(err){
         LOG->err("execute redis command failed");
     }
@@ -71,18 +71,36 @@ void AsyncRedis::exec_l()// export to lua
 
 void AsyncRedis::on_connected(const redisAsyncContext* c, int status)
 {
-
+    if(status != REDIS_OK){
+        LOG->cri("connect redis failed.");
+        return;
+    }
+    LOG->inf("connect redis success.");
 }
 
 
 void AsyncRedis::on_disconnected(const redisAsyncContext* c, int status)
 {
-
+    if(status != REDIS_OK){
+        LOG->cri("redis lost connection");
+        return;
+    }
 }
 
 
 void AsyncRedis::on_command(redisAsyncContext* c, void* r, void* privdate)
 {
-
+    redisReply* reply = (redisReply*)r;
+    if(!reply){
+        LOG->err("redis reply with nullptr");
+        return;
+    }
+    AsyncRedis* that = (AsyncRedis*)privdata;
+    if(!that){
+        LOG->err("redis privdata is nullptr");
+        return;
+    }
+    
+    // real callback
 }
 
