@@ -1,7 +1,7 @@
 #ifndef _THECURE_SESSION_H_
 #define _THECURE_SESSION_H_
 
-#include "server.h"
+#include "hub.h"
 #include "buffer.h"
 #include "dispatcher.h"
 
@@ -21,7 +21,7 @@ typedef struct {
  */
 class Session {
 public:
-    explicit Session(Server* s);
+    explicit Session(Hub* s);
     ~Session();
     // called in listener
     int accept(uv_stream_t* s);

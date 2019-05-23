@@ -1,11 +1,12 @@
 #include "redis.h"
+
 #include <hiredis/hiredis.h>
 #include <hiredis/async.h>
 #include <hiredis/adapters/libuv.h>
 #include <logger.h>
 
 
-AsyncRedis::AsyncRedis(Server* s):m_server(s), m_closing(false)
+AsyncRedis::AsyncRedis(Hub* s):m_hub(s), m_closing(false)
 {
 
 }
@@ -24,7 +25,7 @@ int AsyncRedis::connect(const char* ip, int port)
         return m_ctx->err;
     }
 
-    int err = redisLibuvAttach(m_ctx, m_server->handle());
+    int err = redisLibuvAttach(m_ctx, m_hub->handle());
     if(err){
         LOG->err("attach error");
         return err;
@@ -54,16 +55,16 @@ void AsyncRedis::close()
 }
 
 
-int AsyncRedis::exec(const char* command)
+int AsyncRedis::exec(const char* command, cb_command_t func)
 {
-    int err = redisAsyncCommand(m_ctx, on_command, (void*)this, command);
+    int err = redisAsyncCommand(m_ctx, on_command, (void*)&func, command);
     if(err){
         LOG->err("execute redis command failed");
     }
     return err;
 }
 
-void AsyncRedis::exec_l()// export to lua
+void AsyncRedis::exec_l(lua_State* L, const char* command, luabridge::LuaRef ref)// export to lua
 {
 
 }
@@ -88,19 +89,18 @@ void AsyncRedis::on_disconnected(const redisAsyncContext* c, int status)
 }
 
 
-void AsyncRedis::on_command(redisAsyncContext* c, void* r, void* privdate)
+void AsyncRedis::on_command(redisAsyncContext* c, void* r, void* privdata)
 {
     redisReply* reply = (redisReply*)r;
     if(!reply){
         LOG->err("redis reply with nullptr");
         return;
     }
-    AsyncRedis* that = (AsyncRedis*)privdata;
-    if(!that){
+    cb_command_t *func = (cb_command_t*)privdata;
+    if(!func){
         LOG->err("redis privdata is nullptr");
         return;
     }
-    
-    // real callback
+    (*func)(reply);
 }
 

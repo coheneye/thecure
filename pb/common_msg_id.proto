@@ -1,0 +1,12 @@
+syntax = "proto3"
+package thecure.msg
+
+
+enum MsgId {
+    // check into game
+    cs_checkin = 1;   
+    sc_checkin = 2;
+
+    ntf_user_info = 3;
+    
+}

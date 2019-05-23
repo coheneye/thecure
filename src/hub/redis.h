@@ -1,7 +1,9 @@
 #ifndef _THECURE_REDIS_H_
 #define _THECURE_REDIS_H_
 
-#include "server.h"
+#include <unordered_map>
+#include <functional>
+#include "hub.h"
 #include <hiredis/async.h>
 #include <luacxx.h>
 #include <LuaBridge/LuaBridge.h>
@@ -13,16 +15,19 @@
  * 2) auto reconnect
  * todo: batched command
  */
+
+typedef std::function<void(redisReply*)> cb_command_t;
+
 class AsyncRedis final {
 public:
-    AsyncRedis(Server* s);
+    AsyncRedis(Hub* s);
     ~AsyncRedis();
 
     int connect(const char* ip, int port);
     void close();
 
     // in c++, we save the callback func address, then call it when reply come back.
-    int exec(const char* command);
+    int exec(const char* command, cb_command_t func);
     // in lua manner, we put every callback function into a map, indexed with hash of command
     // and then call the function which request the command.
     void exec_l(lua_State* L, const char* command, luabridge::LuaRef ref);// export to lua
@@ -32,8 +37,9 @@ protected:
     static void on_command(redisAsyncContext* c, void* r, void* privdate);
 
 protected:
+    std::unordered_map<std::string, std::string> m_callbacks;
     redisAsyncContext* m_ctx;
-    Server* m_server;
+    Hub* m_hub;
     bool m_closing;  // intend to close
 };
 

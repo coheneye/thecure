@@ -4,7 +4,7 @@
 #include "manager.h"
 
 
-Listener::Listener(Server* s):m_server(s)
+Listener::Listener(Hub* s):m_hub(s)
 {
     uv_tcp_init(s->handle(), &m_hot);
     m_hot.data = (void*)this;
@@ -43,7 +43,7 @@ int Listener::listen(const char* ip, unsigned short port)
 
         Listener *l = (Listener*)s->data;
         // free session instance sometime somewhere
-        Session *ses = new Session(l->m_server);
+        Session *ses = new Session(l->m_hub);
         if(!ses){
             //log
             return;

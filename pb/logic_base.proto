@@ -1,0 +1,22 @@
+syntax = "proto3"
+
+
+message UserInfo {
+    int32 user_id = 1;
+    string username = 2;
+    string nickname = 3;
+    string passwd_hashed = 4;
+    string header = 5;
+    string geo = 6;
+    string remote = 7;
+}
+
+message UserFortune {
+    int64 balance;
+    int64 deposite;
+    reserved diamond;
+}
+
+message UserInfoExt {
+    
+}

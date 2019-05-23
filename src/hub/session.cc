@@ -9,7 +9,7 @@ uint64_t Session::ms_stat_received = 0;
 uint64_t Session::ms_stat_sent = 0;
 
 
-Session::Session(Server* s):m_buf_tracer(0), 
+Session::Session(Hub* s):m_buf_tracer(0), 
     m_read_buf(DEF_RECEIVE_BUF_SIZE),
     m_send_buf(DEF_SEND_BUF_SIZE)
 {

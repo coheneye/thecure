@@ -1,0 +1,10 @@
+syntax = "proto3"
+
+
+message C_Checkin {
+
+}
+
+message S_Checkin {
+
+}
