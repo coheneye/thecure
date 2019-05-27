@@ -1,0 +1,29 @@
+syntax = "proto3"
+
+package thecure
+
+import "google/protobuf/any.proto";
+
+
+message Request {
+    int32 msg_id;
+    int32 user_id;
+    int32 logic_id;
+    int32 table_id;
+    int32 room_id;
+    int32 agent_id;
+    int32 ses_id;
+    google.protobuf.Any data;
+}
+
+
+message Response {
+    int32 msg_id;
+    int32 user_id;
+    int32 logic_id;
+    int32 table_id;
+    int32 room_id;
+    int32 agent_id;
+    int32 ses_id;
+    google.protobuf.Any data;
+}
