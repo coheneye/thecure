@@ -4,7 +4,7 @@
 #include "hub.h"
 
 
-class Listener{
+class Listener {
 public:
     explicit Listener(Hub* s);
     virtual ~Listener();
@@ -12,7 +12,7 @@ public:
     int listen(const char* ip, unsigned short port);
 
 protected:
-    uv_tcp_t m_hot;   // handle of tcp of listening
+    void* m_hot;   // handle of tcp of listening
     Hub* m_hub;
 };
 

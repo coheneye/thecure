@@ -4,6 +4,7 @@
 
 #include <hub.h>
 #include <luacxx.h>
+#include <manager.h>
 
 
 class Server{

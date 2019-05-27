@@ -2,12 +2,16 @@
 #include "listener.h"
 #include "session.h"
 #include "manager.h"
+#include <uv.h>
 
 
 Listener::Listener(Hub* s):m_hub(s)
 {
-    uv_tcp_init(s->handle(), &m_hot);
-    m_hot.data = (void*)this;
+    m_hot = malloc(sizeof(uv_tcp_t));
+    uv_tcp_t* tmp = (uv_tcp_t*)m_hot;
+    tmp->data = (void*)this;
+
+    uv_tcp_init((uv_loop_t*)s->handle(), (uv_tcp_t*)m_hot);
 }
 
 
@@ -16,8 +20,9 @@ Listener::~Listener()
     auto on_closed = [](uv_handle_t* h){
 
     };
-
     uv_close((uv_handle_t*)&m_hot, on_closed);
+    free(m_hot);
+    m_hot = 0;
 }
 
 
@@ -31,7 +36,7 @@ int Listener::listen(const char* ip, unsigned short port)
         return ec;
     }
 
-    ec = uv_tcp_bind(&m_hot, (const sockaddr*)&addr, 0);
+    ec = uv_tcp_bind((uv_tcp_t*)m_hot, (const sockaddr*)&addr, 0);
     if(ec){
         return ec;
     }

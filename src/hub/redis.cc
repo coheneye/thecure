@@ -25,7 +25,7 @@ int AsyncRedis::connect(const char* ip, int port)
         return m_ctx->err;
     }
 
-    int err = redisLibuvAttach(m_ctx, m_hub->handle());
+    int err = redisLibuvAttach(m_ctx, (uv_loop_t*)(m_hub->handle()));
     if(err){
         LOG->err("attach error");
         return err;

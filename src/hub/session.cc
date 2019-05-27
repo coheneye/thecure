@@ -13,7 +13,7 @@ Session::Session(Hub* s):m_buf_tracer(0),
     m_read_buf(DEF_RECEIVE_BUF_SIZE),
     m_send_buf(DEF_SEND_BUF_SIZE)
 {
-    uv_tcp_init(s->handle(), &m_hot);
+    uv_tcp_init((uv_loop_t*)s->handle(), &m_hot);
     m_hot.data = (void*)this;
 
     m_disp = new EchoDispatcher();

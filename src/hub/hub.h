@@ -1,8 +1,6 @@
 #ifndef _THECURE_HUB_H_
 #define _THECURE_HUB_H_
 
-#include <uv.h>
-#include <singleton.h>
 
 /**
  * 
@@ -13,11 +11,13 @@ public:
 
     virtual ~Hub();
 
-    uv_loop_t * handle() const ;
+    void * handle() const ;
 
-    virtual int serve_forever();
+    int serve_forever();
+    int stop();
+    
 protected:
-    uv_loop_t *m_hol;    // handle of loop
+    void *m_hol;    // handle of loop
 };
 
 
