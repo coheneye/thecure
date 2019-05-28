@@ -14,7 +14,7 @@ IDispatcher::~IDispatcher()
 }
 
 
-void EchoDispatcher::dispatch(uv_stream_t* s, char* data, size_t data_len) 
+void EchoDispatcher::dispatch(ISession* ses, char* data, int data_len) 
 {
         
 }

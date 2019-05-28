@@ -23,11 +23,17 @@ public:
     int start_read();
     int send(const char* buf, unsigned int size);
     // close session. but not free memeory.
+    
     int close();
     
     // session id.
     // unique within single process.
     int64_t id() const;
+
+    void* get_tag();
+    void set_tag(void*);
+protected:
+    int inner_close();
 
 public:
     void * m_hdl;
@@ -35,6 +41,7 @@ public:
     Hub* m_hub;
     Manager* m_mgr;
     IDispatcher* m_disp;
+    void* m_tag;
 };
 
 

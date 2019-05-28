@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <memory>
-
+#include <uv.h>
 #include "session.h"
 
 
@@ -26,7 +26,10 @@ ISession::ISession(Hub *h, IDispatcher* disp, Manager* m):m_hub(h),m_disp(disp),
 
 ISession::~ISession()
 {
-    this->close();
+    this->inner_close();
+
+    free(m_writer);
+    free(m_hdl);
 }
 
 
@@ -34,8 +37,10 @@ int ISession::start_read()
 {
     auto on_alloc = [](uv_handle_t* h, size_t suggested_size, uv_buf_t* buf){
         ISession* ses = (ISession*)h->data;
-
-        ses->m_disp->support(buf);
+        char* b;
+        unsigned int l;
+        ses->m_disp->support(b, &l);
+        *buf = uv_buf_init(b, l);
     };
 
     auto on_read = [](uv_stream_t* h, ssize_t read, const uv_buf_t* buf){
@@ -70,6 +75,12 @@ int ISession::send(const char* buf, unsigned int size)
 }
 
 
+int ISession::inner_close()
+{
+    uv_close((uv_handle_t*)m_hdl, 0);
+}
+
+
 int ISession::close()
 {
     auto on_closed = [](uv_handle_t* h){
@@ -85,4 +96,14 @@ int ISession::close()
 int64_t ISession::id() const
 {
     return *(int64_t*)m_hdl;
+}
+
+void* ISession::get_tag()
+{
+    return m_tag;
+}
+
+void ISession::set_tag(void* tag)
+{
+    m_tag = tag;
 }

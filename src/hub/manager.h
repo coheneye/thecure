@@ -2,7 +2,9 @@
 #define _THECURE_MANAGER_H_
 
 
+#include "hub.h"
 #include <unordered_map>
+
 
 class ISession;
 
@@ -14,7 +16,7 @@ class ISession;
  */
 class Manager {
 private:
-    explicit Manager();
+    explicit Manager(Hub* b);
     ~Manager();
 public:
     int do_accept(void* s);
@@ -35,6 +37,7 @@ public:
     int remove_session(ISession* ses);
 
 protected:
+    Hub* m_hub;
     std::unordered_map<int64_t, ISession*> m_sessions;
 };
 
