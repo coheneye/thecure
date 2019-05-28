@@ -1,7 +1,10 @@
 #ifndef _THECURE_MANAGER_H_
 #define _THECURE_MANAGER_H_
 
-#include "session.h"
+
+#include <unordered_map>
+
+class ISession;
 
 /**
  * @brief: session manager
@@ -14,13 +17,25 @@ private:
     explicit Manager();
     ~Manager();
 public:
-    static Manager* inst();
+    int do_accept(void* s);
+    int do_connected();
 
-    void add(Session* ses);
-    void remove(Session* ses);
+    virtual ISession* new_session();
+    virtual void free_session(ISession* ses);
+
+    ISession* get_session(int64_t id);
+
+    int do_read_error(ISession* ses, int status);
+    int do_write_error(ISession* ses, int status);
+    int do_close(ISession* ses);
+    
+    /**> verify user success */
+    int do_update_user(ISession* ses);
+    /**> kick */
+    int remove_session(ISession* ses);
 
 protected:
-    static Manager* m_inst;
+    std::unordered_map<int64_t, ISession*> m_sessions;
 };
 
 

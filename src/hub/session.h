@@ -2,7 +2,7 @@
 #define _THECURE_SESSION_H_
 
 #include "hub.h"
-#include "buffer.h"
+#include "manager.h"
 #include "dispatcher.h"
 
 
@@ -10,49 +10,32 @@
 #define DEF_SEND_BUF_SIZE DEF_RECEIVE_BUF_SIZE
 
 
-typedef struct {
-    uv_write_t wh;
-    uv_buf_t b;
-}writer_t;
-
 /**
- * Session: represents a TCP connection.
+ * 
  * 
  */
-class Session {
+class ISession {
 public:
-    explicit Session(Hub* s);
-    ~Session();
-    // called in listener
-    int accept(uv_stream_t* s);
-
-    int connect(const struct sockaddr* dest, int* dest_len);
+    ISession(Hub *h, IDispatcher* disp, Manager* m);
+    virtual ~ISession();
 
     // stream mode
     int start_read();
-    int send(const char* buf, int size);
+    int send(const char* buf, unsigned int size);
     // close session. but not free memeory.
     int close();
     
     // session id.
     // unique within single process.
-    int id();
+    int64_t id() const;
 
 public:
-    
-protected:
+    void * m_hdl;
+    void * m_writer;
+    Hub* m_hub;
+    Manager* m_mgr;
     IDispatcher* m_disp;
-    uv_tcp_t m_hot;         // used in server/client mode
-    writer_t m_writer;
-    uv_connect_t m_conn;    // used in client mode
-
-    int m_buf_tracer;
-
-    Buffer m_read_buf;
-    Buffer m_send_buf;
-
-    static uint64_t ms_stat_received;   // total received bytes
-    static uint64_t ms_stat_sent;       // total send bytes
 };
+
 
 #endif

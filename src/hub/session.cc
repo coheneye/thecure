@@ -2,100 +2,87 @@
 #include <memory>
 
 #include "session.h"
-#include "manager.h"
 
 
-uint64_t Session::ms_stat_received = 0;
-uint64_t Session::ms_stat_sent = 0;
+typedef struct writer_t{
+    uv_write_t w;
+    uv_buf_t b;
+}mv_write_t;
 
 
-Session::Session(Hub* s):m_buf_tracer(0), 
-    m_read_buf(DEF_RECEIVE_BUF_SIZE),
-    m_send_buf(DEF_SEND_BUF_SIZE)
+ISession::ISession(Hub *h, IDispatcher* disp, Manager* m):m_hub(h),m_disp(disp),m_mgr(m)
 {
-    uv_tcp_init((uv_loop_t*)s->handle(), &m_hot);
-    m_hot.data = (void*)this;
+    m_hdl = malloc(sizeof(uv_tcp_t));
+    
+    uv_tcp_t* tmp = (uv_tcp_t*)m_hdl;
+    tmp->data = (void*)this;
+    uv_tcp_init((uv_loop_t*)m_hub->handle(), tmp);
 
-    m_disp = new EchoDispatcher();
+    m_writer = malloc(sizeof(mv_write_t));
+    uv_write_t* t = (uv_write_t*)m_writer;
+    t->data = (void*)this;
 }
 
 
-Session::~Session()
+ISession::~ISession()
 {
     this->close();
 }
 
 
-int Session::accept(uv_stream_t* s)
-{
-    int ec = uv_accept(s, (uv_stream_t*)&this->m_hot);
-    if(ec){
-        this->close();
-    }else{
-        Manager::inst()->add(this);
-    }
-    
-    return ec;
-}
-
-
-int Session::connect(const struct sockaddr* dest, int* dest_len)
-{
-
-}
-
-
-int Session::start_read()
+int ISession::start_read()
 {
     auto on_alloc = [](uv_handle_t* h, size_t suggested_size, uv_buf_t* buf){
-        Session* ses = (Session*)h->data;
+        ISession* ses = (ISession*)h->data;
 
-        ses->m_read_buf.resize(suggested_size);
-        buf->base = ses->m_read_buf.buf();
-        buf->len = ses->m_read_buf.size();
+        ses->m_disp->support(buf);
     };
 
     auto on_read = [](uv_stream_t* h, ssize_t read, const uv_buf_t* buf){
-        Session* ses = (Session*)h->data;
-        if(read < 0){
+        ISession* ses = (ISession*)h->data;
+        if(read < 0 && read != UV_EOF){
             //@log
-            ses->close();
+            ses->m_mgr->do_read_error(ses, read);
+            return;
         }else if(read > 0){
-            //@where to process data
+            ses->m_disp->dispatch(ses, buf->base, buf->len);
         }
     };
-    return uv_read_start((uv_stream_t*)&m_hot, on_alloc, on_read);
+    return uv_read_start((uv_stream_t*)m_hdl, on_alloc, on_read);
 }
 
 
-int Session::send(const char* buf, int size)
+int ISession::send(const char* buf, unsigned int size)
 {
-    m_writer.b = uv_buf_init((char*)buf, size);
+    mv_write_t* w = (mv_write_t*)m_writer;
+
+    w->b = uv_buf_init((char*)buf, size);
 
     auto on_sent = [](uv_write_t* h, int status){
+        ISession* ses = (ISession*)h->data;
         if(status){
             //log
+            ses->m_mgr->do_write_error(ses, status);
             return;
         }
     };
-    return uv_write((uv_write_t*)&m_writer, (uv_stream_t*)&m_hot, &m_writer.b, 1, on_sent);
+    return uv_write((uv_write_t*)m_writer, (uv_stream_t*)m_hdl, &w->b, 1, on_sent);
 }
 
 
-int Session::close()
+int ISession::close()
 {
     auto on_closed = [](uv_handle_t* h){
-        Session* ses = (Session*)h->data;
-        h->data = nullptr;
-        Manager::inst()->remove(ses);
+        ISession* ses = (ISession*)h->data;
+        ses->m_mgr->do_close(ses);
     };
 
-    uv_close((uv_handle_t*)&m_hot, on_closed);
+    uv_close((uv_handle_t*)m_hdl, on_closed);
     return 0;
 }
 
 
-int Session::id()
+int64_t ISession::id() const
 {
-    return *(int*)&m_hot;
+    return *(int64_t*)m_hdl;
 }

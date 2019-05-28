@@ -1,6 +1,9 @@
 #ifndef _THECURE_HUB_H_
 #define _THECURE_HUB_H_
 
+#include <stdint.h>
+#include <functional>
+
 
 /**
  * 

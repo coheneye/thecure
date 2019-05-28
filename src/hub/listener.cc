@@ -5,7 +5,7 @@
 #include <uv.h>
 
 
-Listener::Listener(Hub* s):m_hub(s)
+Listener::Listener(Hub* s, Manager* m):m_hub(s),m_mgr(m)
 {
     m_hot = malloc(sizeof(uv_tcp_t));
     uv_tcp_t* tmp = (uv_tcp_t*)m_hot;
@@ -43,22 +43,12 @@ int Listener::listen(const char* ip, unsigned short port)
 
     auto on_new_conn = [](uv_stream_t * s, int status){
         if(status < 0){
+            //TODO: error
             return;
         }
 
-        Listener *l = (Listener*)s->data;
-        // free session instance sometime somewhere
-        Session *ses = new Session(l->m_hub);
-        if(!ses){
-            //log
-            return;
-        }
-    
-        if(ses->accept(s)){
-            delete ses;
-            return;
-        }
-        ses->start_read();
+        Listener* lis = (Listener*)s->data;
+        lis->m_mgr->do_accept((void*)s);
     };
 
     return uv_listen((uv_stream_t*)&m_hot, 1024, on_new_conn);
