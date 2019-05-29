@@ -38,8 +38,8 @@ int ISession::start_read()
     auto on_alloc = [](uv_handle_t* h, size_t suggested_size, uv_buf_t* buf){
         ISession* ses = (ISession*)h->data;
         char* b;
-        unsigned int l;
-        ses->m_disp->support(b, &l);
+        unsigned int l = suggested_size;
+        ses->m_disp->lend(b, &l);
         *buf = uv_buf_init(b, l);
     };
 
@@ -48,10 +48,10 @@ int ISession::start_read()
         if(read < 0 && read != UV_EOF){
             //@log
             ses->m_mgr->do_read_error(ses, read);
-            return;
         }else if(read > 0){
             ses->m_disp->dispatch(ses, buf->base, buf->len);
         }
+        ses->m_disp->remand(buf->base, buf->len);
     };
     return uv_read_start((uv_stream_t*)m_hdl, on_alloc, on_read);
 }
@@ -96,6 +96,11 @@ int ISession::close()
 int64_t ISession::id() const
 {
     return *(int64_t*)m_hdl;
+}
+
+void* ISession::handle()
+{
+    return (void*)m_hdl;
 }
 
 void* ISession::get_tag()

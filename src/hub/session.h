@@ -30,6 +30,7 @@ public:
     // unique within single process.
     int64_t id() const;
 
+    void* handle();
     void* get_tag();
     void set_tag(void*);
 protected:

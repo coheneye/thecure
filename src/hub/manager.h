@@ -7,13 +7,14 @@
 
 
 class ISession;
-
+class IDispatcher;
 /**
  * @brief: session manager
  * 
  * MUST map user_id-->session satisfy O(1)
  * 
  */
+
 class Manager {
 private:
     explicit Manager(Hub* b);
@@ -32,13 +33,15 @@ public:
     int do_close(ISession* ses);
     
     /**> verify user success */
-    int do_update_user(ISession* ses);
+    int do_update_user(ISession* ses, uint64_t user_id);
+    ISession* get_user_session(uint64_t user_id);
     /**> kick */
     int remove_session(ISession* ses);
 
 protected:
     Hub* m_hub;
     std::unordered_map<int64_t, ISession*> m_sessions;
+    std::unordered_map<uint64_t, ISession*> m_user_session;
 };
 
 

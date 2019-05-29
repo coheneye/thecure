@@ -35,7 +35,12 @@ protected:
     std::string m_data;
 };
 
+template<class T>
+class Mgr{
+public:
 
+private:
+};
 // create logger with 2 targets with different log levels and formats.
 // the console will show only warnings or errors, while the file will log all.
 void multi_sink_example()
