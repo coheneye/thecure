@@ -1,5 +1,6 @@
 #include "manager.h"
 #include "session.h"
+#include <uv.h>
 
 
 Manager::Manager(Hub* h):m_hub(h)
@@ -14,8 +15,31 @@ Manager::~Manager()
         this->free_session(pair.second);
     }
     m_sessions.clear();
+    m_tag_sessions.clear();
 }
 
+int Manager::do_accept(void* s)
+{
+    ISession* ses = this->new_session();
+    if(!ses){
+        //@TODO LOG
+        return -1;
+    }
+    int ret = uv_accept((uv_stream_t*)s, (uv_stream_t*)ses->handle());
+    if(ret){
+        return ret;
+    }
+
+    m_sessions[ses->id()] = ses;
+
+    return ret;
+}
+
+
+int Manager::do_connected()
+{
+
+}
 
 ISession* Manager::new_session()
 {
@@ -57,19 +81,21 @@ int Manager::do_close(ISession* ses)
     this->free_session(ses);
 
     m_sessions.erase(ses->id());
+    m_tag_sessions.erase(ses->get_tag());
 }
 
 
 /**> verify user success */
-int Manager::do_update_user(ISession* ses, uint64_t user_id)
+int Manager::do_update_session_tag(ISession* ses, void* tag)
 {
-    ses->set_tag((void*)user_id);
+    ses->set_tag(tag);
+    m_tag_sessions[tag] = ses;  // insert
 }
 
-ISession* Manager::get_user_session(uint64_t user_id)
+ISession* Manager::get_session_by_tag(void* tag)
 {
-    auto it = m_user_session.find(user_id);
-    if(it == m_user_session.end()){
+    auto it = m_tag_sessions.find(tag);
+    if(it == m_tag_sessions.end()){
         return nullptr;
     }
     return it->second;

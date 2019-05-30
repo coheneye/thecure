@@ -20,7 +20,9 @@ private:
     explicit Manager(Hub* b);
     ~Manager();
 public:
+    // used for server side session manager
     int do_accept(void* s);
+    // used for client session manager
     int do_connected();
 
     virtual ISession* new_session();
@@ -33,15 +35,15 @@ public:
     int do_close(ISession* ses);
     
     /**> verify user success */
-    int do_update_user(ISession* ses, uint64_t user_id);
-    ISession* get_user_session(uint64_t user_id);
+    int do_update_session_tag(ISession* ses, void* tag);
+    ISession* get_session_by_tag(void* tag);
     /**> kick */
     int remove_session(ISession* ses);
 
 protected:
     Hub* m_hub;
     std::unordered_map<int64_t, ISession*> m_sessions;
-    std::unordered_map<uint64_t, ISession*> m_user_session;
+    std::unordered_map<void*, ISession*> m_tag_sessions;
 };
 
 
