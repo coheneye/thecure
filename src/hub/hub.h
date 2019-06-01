@@ -20,7 +20,7 @@ public:
     int stop();
     
 protected:
-    void *m_hol;    // handle of loop
+    void *m_hdl;    // handle of loop
 };
 
 

@@ -17,13 +17,13 @@ IDispatcher::~IDispatcher()
 }
 
 /** @buf: 为输出参数 */
-void IDispatcher::lend(char* buf, unsigned int* len)
+void IDispatcher::lend(char** buf, unsigned int* len)
 {
     // default implement
     if(*len < 8){
         *len = 8;
     }
-    buf = (char*)malloc(*len);
+    *buf = (char*)malloc(*len);
     std::cout << "default lend() implementation." << std::endl;
     return;
 }

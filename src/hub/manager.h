@@ -16,7 +16,7 @@ class IDispatcher;
  */
 
 class Manager {
-private:
+public:
     explicit Manager(Hub* b);
     ~Manager();
 public:

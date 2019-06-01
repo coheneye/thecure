@@ -10,7 +10,7 @@ public:
     IDispatcher();
     virtual ~IDispatcher();
     /** @buf: 为输出参数 */
-    virtual void lend(char* buf, unsigned int* len);
+    virtual void lend(char** buf, unsigned int* len);
     virtual void remand(char* buf, unsigned int len);
 
     virtual void dispatch(ISession* ses, char* data, int data_len);

@@ -76,49 +76,49 @@ void multi_sink_example2()
     logger->info("waht");
 }
 
-// main
-int
-main(int argc, char** argv)
-{
-    //multi_sink_example2();
-    //multi_sink_example();
-    // init logger
-    LOG->init(LOGGER_LEVEL_TRACE);
+// // main
+// int
+// main(int argc, char** argv)
+// {
+//     //multi_sink_example2();
+//     //multi_sink_example();
+//     // init logger
+//     LOG->init(LOGGER_LEVEL_TRACE);
 
-    LOG->dbg("init lua");
-    LOG->inf("export to lua");
-    LOG->err("take care");
+//     LOG->dbg("init lua");
+//     LOG->inf("export to lua");
+//     LOG->err("take care");
 
-    // spdlog::set_level(spdlog::level::trace);
-    // spdlog::debug("debug"); 
-    // spdlog::trace("trac");
+//     // spdlog::set_level(spdlog::level::trace);
+//     // spdlog::debug("debug"); 
+//     // spdlog::trace("trac");
 
-    lua_State *L = luaL_newstate();
-    luaL_openlibs(L);
+//     lua_State *L = luaL_newstate();
+//     luaL_openlibs(L);
 
-    luabridge::getGlobalNamespace(L)
-        .beginClass<Line>("Line")
-            .addConstructor<void(*)(const std::string&)>()
-            .addFunction("get_length", &Line::length)
-        .endClass()
-        .addFunction("jprint", jprint);
+//     luabridge::getGlobalNamespace(L)
+//         .beginClass<Line>("Line")
+//             .addConstructor<void(*)(const std::string&)>()
+//             .addFunction("get_length", &Line::length)
+//         .endClass()
+//         .addFunction("jprint", jprint);
     
-    const char* lua_code = " \
-        local line = Line('test') \n \
-        jprint(tostring(line:get_length()))\n \
-    ";
-    // luaL_loadfile(L, "main.lua");
-    luaL_dostring(L, lua_code);
+//     const char* lua_code = " \
+//         local line = Line('test') \n \
+//         jprint(tostring(line:get_length()))\n \
+//     ";
+//     // luaL_loadfile(L, "main.lua");
+//     luaL_dostring(L, lua_code);
 
-    //log->log_dbg("Hello");
-    // say this is an event loop
-    // while(1){
-    //     sleep(1);
-    // }
+//     //log->log_dbg("Hello");
+//     // say this is an event loop
+//     // while(1){
+//     //     sleep(1);
+//     // }
     
-    lua_close(L);
+//     lua_close(L);
 
-    sleep(1);
+//     sleep(1);
 
-    return 0;
-}
+//     return 0;
+// }

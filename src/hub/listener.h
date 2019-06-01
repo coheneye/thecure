@@ -12,7 +12,7 @@ public:
     int listen(const char* ip, unsigned short port);
 
 protected:
-    void* m_hot;   // handle of tcp of listening
+    void* m_hdl;   // handle of tcp of listening
     Hub* m_hub;
     Manager* m_mgr;
 };

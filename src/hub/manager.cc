@@ -1,6 +1,7 @@
 #include "manager.h"
 #include "session.h"
 #include <uv.h>
+#include <iostream>
 
 
 Manager::Manager(Hub* h):m_hub(h)
@@ -20,18 +21,22 @@ Manager::~Manager()
 
 int Manager::do_accept(void* s)
 {
+    std::cout<<"do_accept" <<std::endl;
     ISession* ses = this->new_session();
     if(!ses){
         //@TODO LOG
+        std::cout<< "do_accept() error" << std::endl;
         return -1;
     }
     int ret = uv_accept((uv_stream_t*)s, (uv_stream_t*)ses->handle());
     if(ret){
+        std::cout << "uv_accept failed" << uv_err_name(ret) << std::endl;
         return ret;
     }
 
     m_sessions[ses->id()] = ses;
 
+    ret = ses->start_read();
     return ret;
 }
 

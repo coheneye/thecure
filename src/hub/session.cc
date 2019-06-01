@@ -2,6 +2,7 @@
 #include <memory>
 #include <uv.h>
 #include "session.h"
+#include <iostream>
 
 
 typedef struct writer_t{
@@ -26,8 +27,10 @@ ISession::ISession(Hub *h, IDispatcher* disp, Manager* m):m_hub(h),m_disp(disp),
 
 ISession::~ISession()
 {
-    this->inner_close();
-
+    //this->inner_close();
+    
+    delete m_disp;
+    
     free(m_writer);
     free(m_hdl);
 }
@@ -39,15 +42,22 @@ int ISession::start_read()
         ISession* ses = (ISession*)h->data;
         char* b;
         unsigned int l = suggested_size;
-        ses->m_disp->lend(b, &l);
+        ses->m_disp->lend(&b, &l);
         *buf = uv_buf_init(b, l);
     };
 
     auto on_read = [](uv_stream_t* h, ssize_t read, const uv_buf_t* buf){
         ISession* ses = (ISession*)h->data;
-        if(read < 0 && read != UV_EOF){
-            //@log
-            ses->m_mgr->do_read_error(ses, read);
+        if(read < 0){
+            if (read == UV_EOF){
+                std::cout<<"eof"<<std::endl;
+                ses->close();
+            }else{
+                //@log
+                std::cout<<"read error:"<<uv_err_name(read)<<std::endl;
+                ses->m_mgr->do_read_error(ses, read);
+            }
+            
         }else if(read > 0){
             ses->m_disp->dispatch(ses, buf->base, buf->len);
         }
