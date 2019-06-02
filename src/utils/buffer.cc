@@ -1,6 +1,6 @@
 #include <assert.h>
 
-#include "buffer.h"
+#include <utils/buffer.h>
 
 
 Buffer::Buffer(size_t size)

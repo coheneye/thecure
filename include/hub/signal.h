@@ -2,8 +2,5 @@
 #define _THECURE_SIGNAL_H_
 
 
-#include <uv.h>
-
-
 
 #endif

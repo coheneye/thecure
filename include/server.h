@@ -2,9 +2,9 @@
 #define _THECURE_SERVER_H_
 
 
-#include <hub.h>
-#include <luacxx.h>
-#include <manager.h>
+#include "hub/hub.h"
+#include "utils/luacxx.h"
+#include "hub/manager.h"
 
 
 class Server{

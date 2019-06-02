@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 #include <functional>
+#include <memory>
 
+using defer = std::shared_ptr<void>;
 
 /**
  * 

@@ -1,5 +1,5 @@
-#include "manager.h"
-#include "session.h"
+#include <hub/manager.h>
+#include <hub/session.h>
 #include <uv.h>
 #include <iostream>
 
@@ -41,9 +41,14 @@ int Manager::do_accept(void* s)
 }
 
 
-int Manager::do_connected()
+int Manager::do_connected(ISession* ses)
 {
+    return 0;
+}
 
+int Manager::do_connection_lost(ISession* ses)
+{
+    return 0;
 }
 
 ISession* Manager::new_session()

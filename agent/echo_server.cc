@@ -1,7 +1,7 @@
-#include <session.h>
-#include <listener.h>
-#include <logger.h>
-#include <session.h>
+#include <hub/session.h>
+#include <hub/listener.h>
+#include <utils/logger.h>
+#include <hub/session.h>
 #include <iostream>
 #include <uv.h>
 
@@ -26,17 +26,17 @@ public:
     }
 };
 
-int main(){
-    Hub h;
-    SManager m(&h);
-    Listener l(&h,&m);
-    int ec = l.listen("127.0.0.1", 4040);
-    if(ec){
+// int main(){
+//     Hub h;
+//     SManager m(&h);
+//     Listener l(&h,&m);
+//     int ec = l.listen("127.0.0.1", 4040);
+//     if(ec){
         
-        std::cout<< ec << ":" << uv_err_name(ec) << std::endl;
-    }
+//         std::cout<< ec << ":" << uv_err_name(ec) << std::endl;
+//     }
 
-    h.serve_forever();
+//     h.serve_forever();
 
-    return 0;
-}
+//     return 0;
+// }

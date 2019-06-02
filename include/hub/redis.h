@@ -5,8 +5,8 @@
 #include <functional>
 #include "hub.h"
 #include <hiredis/async.h>
-#include <luacxx.h>
-#include <LuaBridge/LuaBridge.h>
+#include "../utils/luacxx.h"
+#include "../LuaBridge/LuaBridge.h"
 
 /** Redis interface
  * 

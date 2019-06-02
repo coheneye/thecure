@@ -23,7 +23,8 @@ public:
     // used for server side session manager
     int do_accept(void* s);
     // used for client session manager
-    int do_connected();
+    int do_connected(ISession* ses);
+    int do_connection_lost(ISession* ses);
 
     virtual ISession* new_session();
     virtual void free_session(ISession* ses);

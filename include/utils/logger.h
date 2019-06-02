@@ -13,7 +13,7 @@ extern "C" {
     #include <lua.h>
 }
 #include <memory>
-#include <singleton.h>
+#include "singleton.h"
 
 // log level
 // copy from spdlog

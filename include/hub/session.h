@@ -19,6 +19,8 @@ public:
     ISession(Hub *h, IDispatcher* disp, Manager* m);
     virtual ~ISession();
 
+    //
+    int connect(const char* ip, int port);
     // stream mode
     int start_read();
     int send(const char* buf, unsigned int size);

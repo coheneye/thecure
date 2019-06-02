@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <memory>
 #include <uv.h>
-#include "session.h"
+#include <hub/session.h>
 #include <iostream>
 
 
@@ -35,6 +35,33 @@ ISession::~ISession()
     free(m_hdl);
 }
 
+int ISession::connect(const char* ip, int port)
+{
+    auto on_conn_cb = [](uv_connect_t* conn, int status){
+        ISession* ses = (ISession*)conn->data;
+        if(status){
+            //TODO
+            std::cout << "connect failed:" << uv_err_name(status) << std::endl;
+            ses->m_mgr->do_connection_lost(ses);
+            free(conn);
+            return;
+        }
+        ses->m_mgr->do_connected(ses);
+        free(conn);
+    };
+    uv_connect_t* conn = (uv_connect_t*)malloc(sizeof(uv_connect_t));
+    assert(conn);
+    conn->data = (void*)this;
+
+    struct sockaddr_in dest;
+    int ec = uv_ip4_addr(ip, port, &dest);
+    if(ec){
+        std::cout<< "failed to connect to" << ip << std::endl;
+        return ec;
+    }
+    ec = uv_tcp_connect(conn, (uv_tcp_t*)m_hdl, (const sockaddr*)&dest, on_conn_cb);
+    return ec;
+}
 
 int ISession::start_read()
 {

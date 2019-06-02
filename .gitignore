@@ -5,7 +5,10 @@
 *.so
 *.a
 
-src/build/*
+build/
+agent/build/
+src/build/
+logic/build/
 bin/*
 !bin/lua
 .vscode/*

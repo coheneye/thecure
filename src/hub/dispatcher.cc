@@ -1,5 +1,5 @@
-#include "dispatcher.h"
-#include "session.h"
+#include <hub/dispatcher.h>
+#include <hub/session.h>
 
 #include <stdexcept>
 #include <iostream>
