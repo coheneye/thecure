@@ -68,13 +68,10 @@ protected:
 
 Task::Task(Hub* h)
 {
-    m_impl = new Task::TaskImpl(this, h);
+    m_impl = make_unique<TaskImpl>(this, h); //new Task::TaskImpl(this, h);
 }
 
-Task::~Task()
-{
-    delete m_impl;
-}
+Task::~Task() = default;
 
 int Task::run(std::function<void(Task*, void*)> worker,          // 线程函数, 参数 void* 就是传的 worker_param
         void* worker_param, 

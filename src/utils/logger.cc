@@ -60,10 +60,16 @@ private:
     std::shared_ptr<spdlog::logger> m_async_logger;
 };
 
+//============================================= logger ====================
+logger::logger()
+{
+    m_logger = std::make_shared<logger::impl>();
+}
+
+logger::~logger() = default;
 
 bool logger::init(int console_level)
 {   
-    m_logger = std::make_shared<logger::impl>();
     return m_logger->init(console_level);
 }
 

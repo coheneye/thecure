@@ -27,10 +27,9 @@ extern "C" {
 
 
 class logger final : public Singleton<logger> {
-    class impl;
 public:
-    logger(){}
-    ~logger(){}
+    logger();
+    ~logger();
 
     bool init(int console_level);
 
@@ -41,6 +40,7 @@ public:
     void err(const char* s);
     void cri(const char* s);
 private:
+    class impl;
     std::shared_ptr<impl> m_logger;
 };
 

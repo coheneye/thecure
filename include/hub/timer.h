@@ -16,7 +16,7 @@ public:
     uint64_t get_interval();
 private:
     class TimerImpl;
-    TimerImpl* m_impl;
+    unique_ptr<TimerImpl> m_impl;
 };
 
 

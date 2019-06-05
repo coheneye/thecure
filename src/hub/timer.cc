@@ -41,13 +41,10 @@ private:
 
 Timer::Timer(Hub* h)
 {
-    m_impl = new Timer::TimerImpl(h);
+    m_impl = make_unique<TimerImpl>(h);
 }
 
-Timer::~Timer()
-{
-    delete m_impl;
-}
+Timer::~Timer() = default;
 
 int Timer::start(uint64_t timeout, uint64_t repeat, std::function<void(void*data)> cb, void* data)
 {

@@ -33,7 +33,7 @@ public:
 
     int do_read_error(ISession* ses, int status);
     int do_write_error(ISession* ses, int status);
-    int do_close(ISession* ses);
+    int do_closed(ISession* ses);
     
     /**> verify user success */
     int do_update_session_tag(ISession* ses, void* tag);

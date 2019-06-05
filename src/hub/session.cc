@@ -28,9 +28,6 @@ ISession::ISession(Hub *h, IDispatcher* disp, Manager* m):m_hub(h),m_disp(disp),
 ISession::~ISession()
 {
     //this->inner_close();
-    
-    delete m_disp;
-    
     free(m_writer);
     free(m_hdl);
 }
@@ -39,15 +36,18 @@ int ISession::connect(const char* ip, int port)
 {
     auto on_conn_cb = [](uv_connect_t* conn, int status){
         ISession* ses = (ISession*)conn->data;
+        assert(ses);
+        
+        defer _(nullptr, [conn](...){
+            free(conn);
+        });
         if(status){
             //TODO
             std::cout << "connect failed:" << uv_err_name(status) << std::endl;
             ses->m_mgr->do_connection_lost(ses);
-            free(conn);
             return;
         }
         ses->m_mgr->do_connected(ses);
-        free(conn);
     };
     uv_connect_t* conn = (uv_connect_t*)malloc(sizeof(uv_connect_t));
     assert(conn);
@@ -59,6 +59,7 @@ int ISession::connect(const char* ip, int port)
         std::cout<< "failed to connect to" << ip << std::endl;
         return ec;
     }
+
     ec = uv_tcp_connect(conn, (uv_tcp_t*)m_hdl, (const sockaddr*)&dest, on_conn_cb);
     return ec;
 }
@@ -86,9 +87,16 @@ int ISession::start_read()
             }
             
         }else if(read > 0){
-            ses->m_disp->dispatch(ses, buf->base, buf->len);
+            if(ses->m_disp){
+                ses->m_disp->dispatch(ses, buf->base, buf->len);
+            }else{
+                //@log
+            }
+            
         }
-        ses->m_disp->remand(buf->base, buf->len);
+        if(ses->m_disp){
+            ses->m_disp->remand(buf->base, buf->len);
+        }
     };
     return uv_read_start((uv_stream_t*)m_hdl, on_alloc, on_read);
 }
@@ -122,7 +130,7 @@ int ISession::close()
 {
     auto on_closed = [](uv_handle_t* h){
         ISession* ses = (ISession*)h->data;
-        ses->m_mgr->do_close(ses);
+        ses->m_mgr->do_closed(ses);
     };
 
     uv_close((uv_handle_t*)m_hdl, on_closed);

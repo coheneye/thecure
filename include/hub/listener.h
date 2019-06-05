@@ -10,7 +10,7 @@ public:
     virtual ~Listener();
 
     int listen(const char* ip, unsigned short port);
-
+    
 protected:
     void* m_hdl;   // handle of tcp of listening
     Hub* m_hub;

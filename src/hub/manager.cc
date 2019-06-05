@@ -59,6 +59,7 @@ ISession* Manager::new_session()
 
 void Manager::free_session(ISession* ses)
 {
+    delete ses->m_disp;
     delete ses;
     ses = 0;
 }
@@ -86,7 +87,7 @@ int Manager::do_write_error(ISession* ses, int status)
 }
 
 
-int Manager::do_close(ISession* ses)
+int Manager::do_closed(ISession* ses)
 {
     this->free_session(ses);
 

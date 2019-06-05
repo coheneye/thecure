@@ -25,12 +25,14 @@ private:
 class SManager : public Manager{
 public:
     SManager(Hub* b):Manager(b){
+
     }
     virtual ISession* new_session(){
         std::cout<<"new new_session" << std::endl;
         return new ISession(this->m_hub, new ClientDispatcher(), this);
     }
     virtual void free_session(ISession* ses){
+        delete ses->m_disp;
         delete ses;
         ses = 0;
     }
@@ -47,6 +49,7 @@ public:
         return new ISession(this->m_hub, new ServerDispatcher(), this);
     }
     virtual void free_session(ISession* ses){
+        delete ses->m_disp;
         delete ses;
         ses = 0;
     } 
@@ -58,6 +61,14 @@ void test_defer(){
     std::cout << "HHHH" << std::endl;
 }
 
+
+/** agent
+ * 启动参数：agent_id 隐含参数 agent/main.lua
+ * 
+ * 启动后读取 main.lua 中配置，链接 zookeeper, redis, login server, event server 
+ * 注册自身到 zookeeper 
+ * 读取 zookeeper 
+ */
 int main(){
     test_defer();
     Hub h;

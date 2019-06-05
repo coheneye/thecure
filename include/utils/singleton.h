@@ -15,8 +15,8 @@ public:
     static T* get_inst(){
         if(!Singleton::ms_inst){
             Singleton::ms_inst = new T();
-            return Singleton::ms_inst;
         }
+        return Singleton::ms_inst;
     }
     static void release(){
         if(Singleton::ms_inst){
