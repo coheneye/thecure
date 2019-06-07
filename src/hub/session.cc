@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <memory>
 #include <uv.h>
+#include <utils/function.h>
 #include <hub/session.h>
 #include <iostream>
 

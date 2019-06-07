@@ -18,7 +18,7 @@ class IDispatcher;
 class Manager {
 public:
     explicit Manager(Hub* b);
-    ~Manager();
+    virtual ~Manager();
 public:
     // used for server side session manager
     int do_accept(void* s);

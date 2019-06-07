@@ -1,4 +1,5 @@
 #include <hub/signal.h>
+#include <utils/function.h>
 #include <uv.h>
 
 
@@ -10,12 +11,12 @@ public:
         uv_signal_init((uv_loop_t*)h->handle(), &m_hdl);
     }
 
-    int start(int sig, function<void(int)> callback){
+    int start(int sig, std::function<void(int)> callback){
         m_cb_start = callback;
         return uv_signal_start(&m_hdl, cb_signal, sig);
     }
 
-    int oneshot(int sig, function<void(int)> callback){
+    int oneshot(int sig, std::function<void(int)> callback){
         m_cb_oneshot = callback;
         return uv_signal_start_oneshot(&m_hdl, cb_signal, sig);
     }
@@ -40,8 +41,8 @@ protected:
 private:
     Hub* m_h;
     uv_signal_t m_hdl;
-    function<void(int)> m_cb_start;
-    function<void(int)> m_cb_oneshot;
+    std::function<void(int)> m_cb_start;
+    std::function<void(int)> m_cb_oneshot;
 };
 
 
@@ -54,12 +55,12 @@ Signal::Signal(Hub * h)
 Signal::~Signal() = default;
 
 
-int Signal::start(int sig, function<void(int)> callback)
+int Signal::start(int sig, std::function<void(int)> callback)
 {
     m_impl->start(sig, callback);
 }
 
-int Signal::oneshot(int sig, function<void(int)> callback)
+int Signal::oneshot(int sig, std::function<void(int)> callback)
 {
     return m_impl->oneshot(sig, callback);
 }

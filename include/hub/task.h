@@ -22,7 +22,7 @@ public:
 
 private:
     class TaskImpl;
-    unique_ptr<TaskImpl> m_impl;
+    std::unique_ptr<TaskImpl> m_impl;
 };
 
 

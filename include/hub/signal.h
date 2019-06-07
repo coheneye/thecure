@@ -9,13 +9,13 @@ public:
     Signal(Hub * h);
     ~Signal();
 
-    int start(int sig, function<void(int)> callback);
-    int oneshot(int sig, function<void(int)> callback);
+    int start(int sig, std::function<void(int)> callback);
+    int oneshot(int sig, std::function<void(int)> callback);
 
     int stop();
 private:
     class Impl;
-    unique_ptr<Impl> m_impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 
