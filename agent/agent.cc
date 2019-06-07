@@ -1,7 +1,14 @@
 #include <hub/session.h>
 #include <hub/listener.h>
+#include <hub/redis.h>
+#include <hub/timer.h>
+#include <hub/idle.h>
+#include <hub/task.h>
+#include <hub/signal.h>
+
 #include <utils/logger.h>
 #include <utils/function.h>
+
 #include <iostream>
 #include "exports.h"
 #include <utils/lua_manager.h>
@@ -30,25 +37,20 @@ int main(int argc, char** argv)
     gl_info("good, very good");
 
     Hub h;
+
     LuaManager::get_inst()->init_lua();
 
-    exports(LuaManager::get_inst()->get_state());
+    lua_State* L = LuaManager::get_inst()->get_state();
+
+    exports(L);
+
+    luabridge::LuaRef tc = luabridge::getGlobal(L, "tc");
+    tc["hub"] = &h;
 
     LuaManager::get_inst()->do_file("./lua/main.lua");
   
-    // SManager m(&h);
-    // CManager cm(&h);
-    // ISession * ses = cm.new_session();
-    // ses->connect("", 2121);
-    // ses->set_tag((void*)111);
-
-    // Listener l(&h,&m);
-    // int ec = l.listen("127.0.0.1", 4040);
-    // if(ec){
-    //     std::cout<< ec << ":" << uv_err_name(ec) << std::endl;
-    // }
-
     h.serve_forever();
+    
     return 0;
 }
 

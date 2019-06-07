@@ -2,9 +2,11 @@
 #include <utils/function.h>
 #include <utils/lua_manager.h>
 #include <utils/logger.h>
+#include <hub/timer.h>
 
 #include <LuaBridge/LuaBridge.h>
 using namespace luabridge;
+
 
 lua_Debug get_lua_running_pos()
 {
@@ -52,7 +54,7 @@ static void critical(const char* s)
 }
 
 
-void exports_lua(lua_State* L)
+void exports_logger(lua_State* L)
 {
     getGlobalNamespace(L)
         .beginNamespace("log")
@@ -65,9 +67,28 @@ void exports_lua(lua_State* L)
         .endNamespace();
 }
 
+void exports_hub(lua_State* L)
+{
+    getGlobalNamespace(L)
+        .beginNamespace("tc")
+            .beginClass<Hub>("hub")
+            .endClass()
+            .beginClass<Timer>("timer")
+                .addConstructor<void (*) (Hub*)>()
+                .addFunction("start", &Timer::start_lua)
+                .addFunction("stop", &Timer::stop)
+                .addFunction("again", &Timer::again)
+                .addFunction("set_interval", &Timer::set_interval)
+                .addFunction("get_interval", &Timer::get_interval)
+                .addFunction("is_active", &Timer::is_active)
+            .endClass()
+        .endNamespace();
+}
+
 
 bool exports(lua_State* L)
 {
-    exports_lua(L);
+    exports_logger(L);
+    exports_hub(L);
     return true;
 }
