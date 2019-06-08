@@ -1,6 +1,8 @@
 #include <memory>
 #include <string>
 #include <string.h> // strlen
+#include <functional>
+
 
 using namespace std;
 
@@ -14,7 +16,6 @@ using namespace std;
 
 // golang-like defer
 using defer = std::shared_ptr<void>;
-const string g_format("%s[%s:%d:%s]");
 
 
 template<typename T, typename ...Args>
@@ -25,13 +26,14 @@ unique_ptr<T> make_unique(Args&& ...args)
 
 
 template<typename ... Args>
-std::string string_format( const std::string& format, Args ... args )
+std::string string_format( const char* format, Args ... args )
 {
-    size_t size = snprintf( nullptr, 0, format.c_str(), args ... ) + 1; // Extra space for '\0'
+    size_t size = snprintf( nullptr, 0, format, args ... ) + 1; // Extra space for '\0'
     std::unique_ptr<char[]> buf( new char[ size ] ); 
-    snprintf( buf.get(), size, format.c_str(), args ... );
+    snprintf( buf.get(), size, format, args ... );
     return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
 }
+
 
 /** 从路径中获取文件名(utf-8 not supported now)
  * eg. 
@@ -46,3 +48,5 @@ inline const char* get_file_name(const char* fullname)
     }
     return fullname;
 }
+
+#define sf string_format

@@ -6,8 +6,8 @@
 
 class Timer::TimerImpl {
 public:
-    TimerImpl(Hub* h):m_lua_f(LuaManager::get_inst()->get_state()),
-    m_lua_data(LuaManager::get_inst()->get_state()){
+    TimerImpl(Hub* h):m_lua_f(LL),
+    m_lua_data(LL){
         m_timer.data = (void*)this;
         uv_timer_init((uv_loop_t*)h->handle(), &m_timer);
     }

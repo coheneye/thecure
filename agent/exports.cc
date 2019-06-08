@@ -3,6 +3,8 @@
 #include <utils/lua_manager.h>
 #include <utils/logger.h>
 #include <hub/timer.h>
+#include <hub/task.h>
+#include <hub/redis.h>
 
 #include <LuaBridge/LuaBridge.h>
 using namespace luabridge;
@@ -11,7 +13,7 @@ using namespace luabridge;
 lua_Debug get_lua_running_pos()
 {
     lua_Debug ar;
-    lua_State* L = LuaManager::get_inst()->get_state();
+    lua_State* L = LL;
     lua_getstack(L, 1, &ar);
     lua_getinfo(L, "Sln", &ar);
     return ar;
@@ -82,6 +84,34 @@ void exports_hub(lua_State* L)
                 .addFunction("get_interval", &Timer::get_interval)
                 .addFunction("is_active", &Timer::is_active)
             .endClass()
+            .beginClass<Task>("task")
+                .addConstructor<void (*) (Hub*)>()
+                .addFunction("run", &Task::run_lua)
+                .addFunction("cancel", &Task::cancel)
+                .addFunction("send", &Task::send_lua)
+            .endClass()
+        .endNamespace();
+}
+
+
+void exports_redis(lua_State* L)
+{
+    getGlobalNamespace(L)
+        .beginNamespace("tc")
+            .beginClass<RedisResult>("redis_res")   //no constructor, we should never create its instance in lua
+                .addFunction("type", &RedisResult::type)
+                .addFunction("array_size", &RedisResult::array_size)
+                .addFunction("value_of_int", &RedisResult::value_of_int)
+                .addFunction("value_of_str", &RedisResult::value_of_str)
+                .addFunction("value_of_arr", &RedisResult::value_of_arr)
+            .endClass()
+            .beginClass<AsyncRedis>("redis")
+            //    .addConstructor<void (*) (Hub*)>()
+            //    .addFunction("connect", &AsyncRedis::connect)
+            //    .addFunction("close", &AsyncRedis::close)
+                .addFunction("is_connected", &AsyncRedis::is_connected)
+                .addFunction("exec", &AsyncRedis::exec_lua)
+            .endClass()
         .endNamespace();
 }
 
@@ -90,5 +120,6 @@ bool exports(lua_State* L)
 {
     exports_logger(L);
     exports_hub(L);
+    exports_redis(L);
     return true;
 }

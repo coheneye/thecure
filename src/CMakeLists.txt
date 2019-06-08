@@ -27,5 +27,5 @@ file(GLOB_RECURSE SRC_FILES ./*.cc)
 add_library(${PROJECT_NAME} ${SRC_FILES})
 
 # link lua.lib
-target_link_libraries(${PROJECT_NAME} libluajit-5.1.so dl pthread uv)
+target_link_libraries(${PROJECT_NAME} libluajit-5.1.so dl pthread hiredis uv)
 #install(TARGETS thecure DESTINATION /usr/local/lib)

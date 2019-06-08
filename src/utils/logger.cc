@@ -13,7 +13,7 @@ public:
     impl() = default;
     ~impl() = default;
 
-    bool init(const char* name, int console_level)
+    bool init(const char* name, int console_level, int file_level)
     {
         const char* default_name = "default";
         if(!name){
@@ -28,25 +28,28 @@ public:
         // use default format for now.
         //console_sink->set_formatter("");
         auto file_sink = std::make_shared<spdlog::sinks::daily_file_sink_mt>(name, 0, 0, true);
-        file_sink->set_level(spdlog::level::info);
-    
+        file_sink->set_level(static_cast<spdlog::level::level_enum>(file_level));
+
         spdlog::init_thread_pool(8192, 1);  //queue 8k items and 1 backing thread
 
         std::vector<spdlog::sink_ptr> sinks {console_sink, file_sink};
         m_async_logger = std::make_shared<spdlog::async_logger>(name, 
             sinks.begin(), sinks.end(), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
         // NEVER delete this line below.
-        m_async_logger->set_level(spdlog::level::info);
+        m_async_logger->set_level(spdlog::level::trace);
 
         spdlog::register_logger(m_async_logger);
 
         return true;
     }
-    
+    bool stop(){
+        spdlog::shutdown();
+    }
     std::shared_ptr<spdlog::logger> m_async_logger;
 };
 
 //============================================= logger ====================
+const char* g_format = ("%s[%s:%d:%s]");
 
 logger::logger()
 {
@@ -55,9 +58,14 @@ logger::logger()
 
 logger::~logger() = default;
 
-bool logger::init(const char* name, int console_level)
+bool logger::init(const char* name, int console_level, int file_level)
 {   
-    return m_logger->init(name, console_level);
+    return m_logger->init(name, console_level, file_level);
+}
+
+bool logger::stop()
+{
+    return m_logger->stop();
 }
 
 void logger::cri(const char* s, const char* file, int line, const char* func)

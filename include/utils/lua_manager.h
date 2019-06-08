@@ -17,4 +17,6 @@ protected:
     lua_State* m_state;
 };
 
+#define LL LuaManager::get_inst()->get_state()
+
 #endif

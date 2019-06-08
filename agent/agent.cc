@@ -4,6 +4,7 @@
 #include <hub/timer.h>
 #include <hub/idle.h>
 #include <hub/task.h>
+#include <signal.h>
 #include <hub/signal.h>
 
 #include <utils/logger.h>
@@ -33,22 +34,34 @@ int main(int argc, char** argv)
 
     std::string log_name = string_format("%s_%d", argv[0], id);
 
-    LOG->init(log_name.c_str(), LOGGER_LEVEL_INFO);
-    gl_info("good, very good");
+    LOG->init(log_name.c_str(), LOGGER_LEVEL_TRACE);
+    
+    //gl_info("good, very good");
 
     Hub h;
 
     LuaManager::get_inst()->init_lua();
 
-    lua_State* L = LuaManager::get_inst()->get_state();
+    exports(LL);
 
-    exports(L);
+    AsyncRedis redis(&h);
+    redis.connect("127.0.0.1", 6379);
 
-    luabridge::LuaRef tc = luabridge::getGlobal(L, "tc");
+    luabridge::LuaRef tc = luabridge::getGlobal(LL, "tc");
     tc["hub"] = &h;
+    tc["redis"] = &redis;
 
     LuaManager::get_inst()->do_file("./lua/main.lua");
   
+    Signal signal(&h);
+    signal.start(SIGINT, [&h, &redis](int sig){
+        gl_info("user quit.");
+        h.stop();
+        redis.close();
+        LOG->stop();
+        exit(0);
+    });
+
     h.serve_forever();
     
     return 0;

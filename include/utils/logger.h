@@ -31,7 +31,8 @@ public:
     logger();
     ~logger();
 
-    bool init(const char* name, int console_level);
+    bool init(const char* name, int console_level=LOGGER_LEVEL_DEBUG, int file_level=LOGGER_LEVEL_INFO);
+    bool stop(); // make async logger quit.
 
     void trc(const char* s, const char* file, int line, const char* func);
     void dbg(const char* s, const char* file, int line, const char* func);
