@@ -81,14 +81,22 @@ local function keys_if(tbl, func)
     if not next(tbl) then return {} end
     local rtv = {}
     local function __nope(k) return true end
-    local f = func or __nope
+    func = func or __nope
     for k, _ in pairs(tbl) do
-        if f(k) then table.insert(rtv, k) end
+        if func(k) then table.insert(rtv, k) end
     end
     return rtv
 end
 
 
+local function foreach(tbl, fn)
+    for k, v in pairs(tbl) do
+        fn(k, v)
+    end
+end
+
+
 return {
-    
+    filter = filter,
+    foreach = foreach,
 }

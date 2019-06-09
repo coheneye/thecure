@@ -2,21 +2,34 @@ syntax = "proto3"
 
 
 message UserInfo {
-    int32 user_id = 1;
-    string username = 2;
-    string nickname = 3;
+    int32 user_id       = 1;
+    string username     = 2;
+    string nickname     = 3;
     string passwd_hashed = 4;
-    string header = 5;
-    string geo = 6;
-    string remote = 7;
+    string header       = 5;
+    string geo          = 6;
+    string remote       = 7;
 }
 
+
 message UserFortune {
-    int64 balance;
-    int64 deposite;
-    reserved diamond;
+    int64 balance       = 1;    // 账户余额
+    int64 deposite      = 2;    // 冻结金额
+    string unit         = 3;    // 余额单位
+    reserved diamond    = 4;    // 钻石数量 // 没用
 }
+
 
 message UserInfoExt {
     
+}
+
+
+message GameInfo {
+
+}
+
+
+message TableInfo {
+
 }

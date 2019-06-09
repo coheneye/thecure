@@ -5,25 +5,26 @@ package thecure
 import "google/protobuf/any.proto";
 
 
+message MsgHeader{
+    int32 status    = 1;
+    int64 user_id   = 2;
+    int64 logic_id  = 3;
+    int32 room_id   = 4;
+    int32 table_id  = 5;
+    int32 agent_id  = 6;
+    int64 ses_id    = 7;
+}
+
+
 message Request {
-    int32 msg_id;
-    int32 user_id;
-    int32 logic_id;
-    int32 table_id;
-    int32 room_id;
-    int32 agent_id;
-    int32 ses_id;
-    google.protobuf.Any data;
+    int32 msg_id                = 1;
+    MsgHeader header            = 2;
+    google.protobuf.Any req     = 3;
 }
 
 
 message Response {
-    int32 msg_id;
-    int32 user_id;
-    int32 logic_id;
-    int32 table_id;
-    int32 room_id;
-    int32 agent_id;
-    int32 ses_id;
-    google.protobuf.Any data;
+    int32 msg_id                = 1;
+    MsgHeader header            = 2;
+    google.protobuf.Any res     = 3;
 }

@@ -34,19 +34,29 @@ std::string string_format( const char* format, Args ... args )
     return std::string( buf.get(), buf.get() + size - 1 ); // We don't want the '\0' inside
 }
 
+#define sf string_format
+
 
 /** 从路径中获取文件名(utf-8 not supported now)
  * eg. 
  * /usr/local/lib/test.a    returns  test.a
  */
-inline const char* get_file_name(const char* fullname)
-{
-    for(int i = strlen(fullname); i >= 0; i--){
-        if(fullname[i] == PATH_SEP){
-            return fullname + i + 1;
-        }
-    }
-    return fullname;
-}
+const char* get_file_name(const char* fullname);
 
-#define sf string_format
+
+const char* version();
+
+
+const char* platform();
+
+
+uint64_t get_total_mem();
+
+
+uint64_t get_constrained_mem();
+
+
+double get_uptime();
+
+
+std::string get_exe_path();

@@ -4,6 +4,6 @@ package thecure.ec
 
 enum ErrorCode {
     EC_OK = 0;
-    INVALID_LOGIN_INFO = 1;
+    INVALID_CHECKIN_INFO = 1;
     INTERNAL_ERROR = 2;
 }

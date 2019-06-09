@@ -1,0 +1,92 @@
+syntax = "proto3"
+package thecure.msg
+
+
+enum MsgId {
+    // check into game
+    // 统一定义方式为 大写 + 下划线
+    // C 代表客户端发起，MsgId 为 奇数
+    // S 代表服务端返回，MsgId 必须为偶数
+    // B 代表广播消息   MsgId 必须为偶数
+    
+    // 用户签入逻辑服务器。是主要业务逻辑的第一条消息
+    C_CHECKIN_LOGIC = 1;
+    S_CHECKIN_LOGIC = 2;
+
+    C_CHECKOUT_LOGIC = 99;
+    C_CHECKOUT_LOGIC = 100;
+
+    // 用户详情
+    S_USERINFO      = 4;
+
+    // 服务支持的功能，用于生成大厅     
+    S_SUPPORTED     = 6;        
+
+    // 用户绑定手机/邮箱/支付宝/微信等等
+    C_BIND          = 7;
+    S_BIND          = 8;
+
+    // 其他绑定，比如绑定上级推广ID
+    C_BIND_G        = 201;
+    S_BIND_G        = 202;
+
+    // 用户充值，一般不会使用本接口
+    C_RECHARGE      = 9;
+    S_RECHARGE      = 10;
+
+    // 资产冻结
+    C_FREEZE        = 11;
+    S_FREEZE        = 12;
+
+    // 资产解冻
+    C_THAW          = 13;
+    S_THAW          = 14;
+
+    // 任务相关
+    C_TASK_*        = 15;
+    
+    // 排行榜相关
+    C_BOARD_*       = 19;
+
+    // 玩家加入某个房间，## 这个协议之后，直接可以开始某个游戏。
+    C_JOIN          = 31;
+    S_JOIN          = 32;
+    B_JOIN          = 34;
+
+    // 进入指定的房间/桌子/座位。
+    C_JOIN_SPEC     = 35;
+    S_JOIN_SPEC     = 36;
+    B_JOIN_SPEC     = 38;
+
+    C_LEAVE         = 41;
+    S_LEAVE         = 42;
+    B_LEAVE         = 44;
+
+    // 有时候你不得不让有个 READY 之类的东西
+    C_READY         = 51;
+    B_READY         = 52;
+
+    B_USER_CHANGED  = 60;   // 玩家信息变更
+
+    B_TABLE_CHANGED = 62;   // 桌子变更
+
+    C_HANDSUP       = 71;   // 游戏中托管/取消
+    S_HANDSUP       = 72;
+    B_HANDSUP       = 74;
+}
+
+
+enum TableStatus {
+    TS_IDLE     = 0;    // 游戏进程之外，无限等待
+    TS_WATTING  = 1;    // 能够支撑开始游戏的人数已准备，但还有其他人未准备，倒计时。
+    TS_RUNNING  = 5;    // 战斗状态(每个子逻辑在这个过程中可能包含其他更具体的状态，比如发牌，派奖，这些可以定义为 RUNNING_STAGE)
+}
+
+
+enum UserStatus {
+    US_NORMAL   = 0;    // 正常
+    US_STAND    = 1;    // 所谓的观战
+    US_OFFLINE  = 2;    // 掉线，网络断开，客户端崩溃，意外的。
+    US_LEAVE    = 3;    // 离开，游戏中的离开，此时用户还在逻辑中，离开是指故意的离开，可能没掉线，也可能用户主分身在其他游戏逻辑里。
+    US_HOLD     = 4;    // 占座，VIP功能，占座的人就他妈在那个坐上。不参与游戏。
+}
