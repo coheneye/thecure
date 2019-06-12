@@ -14,7 +14,7 @@ public:
     int stop();
 private:
     class IdleImpl;
-    IdleImpl * m_impl;
+    std::unique_ptr<IdleImpl> m_impl;
 };
 
 

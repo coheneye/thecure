@@ -3,7 +3,7 @@
 #include <utils/function.h>
 
 
-uint64_t now_in_secend()
+uint64_t now_in_second()
 {
     return chrono::system_clock::to_time_t(chrono::system_clock::now());
 }
@@ -33,7 +33,7 @@ std::string now_in_str(const char* sep)
 
 TimeCounter::TimeCounter():m_start(chrono::high_resolution_clock::now())
 {
-
+    
 }
 
 TimeCounter::~TimeCounter()=default;

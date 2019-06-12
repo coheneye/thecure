@@ -4,6 +4,7 @@
 #include <map>
 #include <functional>
 #include "hub.h"
+#include "timer.h"
 #include <hiredis/hiredis.h>
 #include <hiredis/async.h>
 #include <utils/luacxx.h>
@@ -55,6 +56,9 @@ public:
     ~AsyncRedis();
 
     int connect(const char* ip, int port);
+
+    int reconnect();
+    
     void close();
 
     bool is_connected();
@@ -73,28 +77,11 @@ protected:
 
     redisAsyncContext* m_ctx;
     Hub* m_hub;
+    Timer m_timer_reconnnect;
     std::string m_host;
     int m_port;
     bool m_closing;  // intend to close
     bool m_is_connected;
-};
-
-
-/**
- * connect redis synchronously
- * do not implement now.
- */
-class SyncRedis {
-public:
-    SyncRedis();
-    ~SyncRedis();
-
-    void connect();
-    void close();
-
-    void exec();
-protected:
-    redisContext* m_ctx;
 };
 
 

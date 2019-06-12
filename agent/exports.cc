@@ -2,6 +2,9 @@
 #include <utils/function.h>
 #include <utils/lua_manager.h>
 #include <utils/logger.h>
+#include <utils/crypto.h>
+#include <utils/time.h>
+
 #include <hub/timer.h>
 #include <hub/task.h>
 #include <hub/redis.h>
@@ -116,10 +119,48 @@ void exports_redis(lua_State* L)
 }
 
 
+void exports_utils(lua_State* L)
+{
+    getGlobalNamespace(L)
+        .beginNamespace("utils")
+            .beginNamespace("crypto")
+                .addFunction("b64enc", &crypto::b64enc)
+                .addFunction("b64dec", &crypto::b64dec)
+                .addFunction("gen_nonce", &crypto::gen_nonce)
+                .addFunction("get_hash_key", &crypto::gen_key_hash)
+                .addFunction("get_hmac256_key", &crypto::gen_key_hash_hmac256)
+                .addFunction("get_hmac512_key", &crypto::gen_key_hash_hmac512)
+                .addFunction("sha256", &crypto::hash_sha256)
+                .addFunction("sha512", &crypto::hash_sha512)
+                .addFunction("hmac256",&crypto::hash_hmac256)
+                .addFunction("hmac512",&crypto::hash_hmac512)
+                .addFunction("hash", &crypto::hash)
+                .addFunction("random", &crypto::random)
+                .addFunction("random_uniform", &crypto::random_uniform)
+                .addFunction("random_str", &crypto::random_str)
+            .endNamespace()
+            .beginNamespace("time")
+                .addFunction("now_in_sec", &now_in_second)
+                .addFunction("now_in_mill", &now_in_millsecond)
+                .addFunction("now_in_str", &now_in_str)
+                .addFunction("today_in_str", &today_in_str)
+            .endNamespace()
+            .beginClass<TimeCounter>("time_counter")
+                .addConstructor<void(*)(void)>()
+                .addFunction("elapse_secs", &TimeCounter::elapse_secs)
+                .addFunction("elapse_mills", &TimeCounter::elapse_mills)
+                .addFunction("reset", &TimeCounter::reset)
+            .endClass()
+        .endNamespace();
+}
+
+
 bool exports(lua_State* L)
 {
     exports_logger(L);
     exports_hub(L);
     exports_redis(L);
+    exports_utils(L);
+    
     return true;
 }

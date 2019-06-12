@@ -7,7 +7,7 @@
 
 using namespace std;
 
-uint64_t now_in_secend();
+uint64_t now_in_second();
 
 uint64_t now_in_millsecond();
 

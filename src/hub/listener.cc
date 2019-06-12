@@ -4,6 +4,9 @@
 #include <hub/manager.h>
 #include <uv.h>
 #include <iostream>
+#include <utils/logger.h>
+#include <utils/function.h>
+
 
 Listener::Listener(Hub* s, Manager* m):m_hub(s),m_mgr(m)
 {
@@ -11,15 +14,17 @@ Listener::Listener(Hub* s, Manager* m):m_hub(s),m_mgr(m)
     uv_tcp_t* tmp = (uv_tcp_t*)m_hdl;
     tmp->data = (void*)this;
 
-    int rc = uv_tcp_init((uv_loop_t*)s->handle(), tmp);
-    assert(rc == 0);
+    int ec = uv_tcp_init((uv_loop_t*)s->handle(), tmp);
+    if(0 != ec){
+        gl_error(sf("uv_tcp_init() failed. ec=%d", ec).c_str());
+    }
 }
 
 
 Listener::~Listener()
 {
     auto on_closed = [](uv_handle_t* h){
-
+        gl_trace("listener closed.");
     };
     uv_close((uv_handle_t*)m_hdl, on_closed);
     free(m_hdl);
@@ -34,28 +39,26 @@ int Listener::listen(const char* ip, unsigned short port)
 
     ec = uv_ip4_addr(ip, port, &addr);
     if(ec){
-        std::cout<< 1 << std::endl;
+        gl_error(sf("uv_ip4_addr() failed.[addr=%s#%d, ec=%d]", ip, (int)port, ec).c_str());
         return ec;
     }
 
     ec = uv_tcp_bind((uv_tcp_t*)m_hdl, (const sockaddr*)&addr, 0);
     if(ec){
-        std::cout<< 2 << std::endl;
+        gl_error(sf("bind failed.[addr=%s#%d, ec=%d]", ip, (int)port, ec).c_str());
         return ec;
     }
 
     auto on_new_conn = [](uv_stream_t * s, int status){
         if(status < 0){
-            //TODO: error
-            std::cout << "on_new_conn error" << std::endl;
+            gl_warn(sf("new connection comes with an error:%d", status).c_str());
             return;
         }
 
         Listener* lis = (Listener*)s->data;
         int ret = lis->m_mgr->do_accept((void*)s);
         if (ret){
-            //TODO: error
-            std::cout<< "do_aacept return failed" << std::endl;
+            gl_warn(sf("do_accept() failed:%d", ret).c_str());
         }
     };
 

@@ -61,7 +61,7 @@ int main(int argc, char** argv)
         LOG->stop();
         exit(0);
     });
-
+    
     h.serve_forever();
     
     return 0;

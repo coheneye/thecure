@@ -1,11 +1,14 @@
 #include <hub/hub.h>
 #include <uv.h>
 #include <memory>
+#include <utils/logger.h>
 
 
 Hub::Hub(){
     m_hdl = malloc(sizeof(uv_loop_t));
-    uv_loop_init((uv_loop_t*)m_hdl);
+    if(0 != uv_loop_init((uv_loop_t*)m_hdl)){
+        gl_crit("uv_loop_init() failed.");
+    }
 }
 
 
@@ -30,4 +33,5 @@ int Hub::serve_forever(){
 int Hub::stop()
 {
     uv_stop((uv_loop_t*)m_hdl);
+    gl_trace("loop stopped.");
 }

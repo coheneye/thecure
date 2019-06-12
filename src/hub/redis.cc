@@ -2,8 +2,6 @@
 #include <utils/function.h>
 #include <utils/logger.h>
 
-#include <hiredis/hiredis.h>
-#include <hiredis/async.h>
 #include <hiredis/adapters/libuv.h>
 
 
@@ -68,7 +66,7 @@ char* RedisResult::value_of_str()
 
 // ================================= AsyncRedis ================================
 
-AsyncRedis::AsyncRedis(Hub* s):m_hub(s), m_closing(false), m_is_connected(false)
+AsyncRedis::AsyncRedis(Hub* s):m_hub(s), m_closing(false), m_is_connected(false), m_timer_reconnnect(s), m_ctx(nullptr)
 {
 
 }
@@ -82,10 +80,19 @@ AsyncRedis::~AsyncRedis()
 
 int AsyncRedis::connect(const char* ip, int port)
 {
-    m_closing = false;
-
     m_host = ip;
     m_port = port;
+    return this->reconnect();
+}
+
+int AsyncRedis::reconnect()
+{
+    m_closing = false;
+
+    if(m_ctx){
+        redisAsyncFree(m_ctx);
+        m_ctx = nullptr;
+    }
 
     m_ctx = redisAsyncConnect(m_host.c_str(), m_port);
     if(!m_ctx){
@@ -94,6 +101,7 @@ int AsyncRedis::connect(const char* ip, int port)
     }
 
     if(m_ctx->err){
+        gl_crit(sf("redis context error: %d", m_ctx->err).c_str());
         return m_ctx->err;
     }
 
@@ -101,22 +109,24 @@ int AsyncRedis::connect(const char* ip, int port)
 
     int err = redisLibuvAttach(m_ctx, (uv_loop_t*)(m_hub->handle()));
     if(err){
+        gl_crit(sf("redis redisLibuvAttach error: %d", err).c_str());
         return err;
     }
 
     err = redisAsyncSetConnectCallback(m_ctx, &AsyncRedis::on_connected);
     if(err){
+        gl_crit(sf("redis redisAsyncSetConnectCallback error: %d", err).c_str());
         return err;
     }
 
     err = redisAsyncSetDisconnectCallback(m_ctx, &AsyncRedis::on_disconnected);
     if(err){
+        gl_crit(sf("redis redisAsyncSetDisconnectCallback error: %d", err).c_str());
         return err;
     }
 
     return err;
 }
-
 
 void AsyncRedis::close()
 {
@@ -179,6 +189,9 @@ void AsyncRedis::on_connected(const struct redisAsyncContext* c, int status)
     AsyncRedis* that = (AsyncRedis*)c->data;
     that->m_is_connected = true;
 
+    if(that->m_timer_reconnnect.is_active()){
+        that->m_timer_reconnnect.stop();
+    }
     gl_info("redis connected.");
 }
 
@@ -193,6 +206,13 @@ void AsyncRedis::on_disconnected(const struct redisAsyncContext* c, int status)
         return;
     }
     gl_error("redis disconnected");
+
+    if(!that->m_closing){
+        that->m_timer_reconnnect.start(1000, 5000, [that](void* p){
+            that->reconnect();
+            gl_warn("redis connect retrying ... ");
+        }, nullptr);
+    }
 }
 
 
@@ -214,9 +234,10 @@ void AsyncRedis::on_command(redisAsyncContext* c, void* r, void* privdata)
         if(it->second){
             RedisResult r = RedisResult(reply);
             it->second(r);
-        }else{
-            gl_warn(sf("redis cmd[%s] without a callback", cmd.c_str()).c_str());
         }
+        // }else{
+        //     gl_warn(sf("redis cmd[%s] without a callback", cmd.c_str()).c_str());
+        // }
         
         that->m_callbacks.erase(it);
     }else{
@@ -246,5 +267,7 @@ void AsyncRedis::on_lua_command(redisAsyncContext* c, void* r, void* privdata)
             it->second(&r);
         }
         that->m_callbacks_lua.erase(it);
+    }else{
+        gl_error(sf("redis lua cmd not found[cmd=%s]", cmd.c_str()).c_str());
     }
 }

@@ -1,12 +1,16 @@
 #include <hub/idle.h>
 #include <uv.h>
+#include <utils/function.h>
+#include <utils/logger.h>
 
 
 class Idle::IdleImpl {
 public:
     IdleImpl(Hub*h){
         m_idle.data = (void*)this;
-        uv_idle_init((uv_loop_t*)h->handle(), &m_idle);
+        if(0 != uv_idle_init((uv_loop_t*)h->handle(), &m_idle)){
+            gl_warn("uv_idle_init() failed");
+        }
     }
 
     ~IdleImpl(){
@@ -36,14 +40,12 @@ private:
 
 Idle::Idle(Hub* h)
 {
-   m_impl = new Idle::IdleImpl(h);
+    m_impl = make_unique<Idle::IdleImpl>(h);
 }
 
 
-Idle::~Idle()
-{
-    delete m_impl;
-}
+Idle::~Idle()=default;
+
 
 int Idle::start(std::function<void(void*)> cb, void* param)
 {
