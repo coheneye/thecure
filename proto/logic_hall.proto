@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package logic.hall;
+
+
+// Protocols transformed to hall server
+
+
+message C_CheckinLogic {
+    string token    = 1;
+    uint32 user_id  = 2;
+}
+
+message S_CheckinLogic {
+    uint32 reserved = 1;
+}

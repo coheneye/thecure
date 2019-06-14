@@ -4,6 +4,7 @@
 *.o
 *.so
 *.a
+*.pb
 
 build/
 agent/build/

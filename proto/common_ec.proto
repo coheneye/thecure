@@ -1,6 +1,8 @@
-syntax = "proto3"
-package thecure.ec
+syntax = "proto3";
 
+package common.ec;
+
+// Defines all types of error codes here
 
 enum ErrorCode {
     EC_OK = 0;

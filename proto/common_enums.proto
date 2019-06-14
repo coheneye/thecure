@@ -1,6 +1,8 @@
-syntax = "proto3"
-package thecure.msg
+syntax = "proto3";
 
+package common.enums;
+
+// Defines all enums
 
 enum MsgId {
     // check into game
@@ -10,11 +12,13 @@ enum MsgId {
     // B 代表广播消息   MsgId 必须为偶数
     
     // 用户签入逻辑服务器。是主要业务逻辑的第一条消息
+    NO_USE          = 0;
+
     C_CHECKIN_LOGIC = 1;
     S_CHECKIN_LOGIC = 2;
 
     C_CHECKOUT_LOGIC = 99;
-    C_CHECKOUT_LOGIC = 100;
+    S_CHECKOUT_LOGIC = 100;
 
     // 用户详情
     S_USERINFO      = 4;
@@ -43,10 +47,10 @@ enum MsgId {
     S_THAW          = 14;
 
     // 任务相关
-    C_TASK_*        = 15;
+    C_TASK_ABOUT        = 15;
     
     // 排行榜相关
-    C_BOARD_*       = 19;
+    C_BOARD_ABOUT       = 19;
 
     // 玩家加入某个房间，## 这个协议之后，直接可以开始某个游戏。
     C_JOIN          = 31;

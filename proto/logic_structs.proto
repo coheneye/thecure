@@ -1,8 +1,12 @@
-syntax = "proto3"
+syntax = "proto3";
+
+package logic.structs;
+
+// Defines structs
 
 
 message UserInfo {
-    int32 user_id       = 1;
+    uint32 user_id      = 1;
     string username     = 2;
     string nickname     = 3;
     string passwd_hashed = 4;
@@ -13,23 +17,23 @@ message UserInfo {
 
 
 message UserFortune {
-    int64 balance       = 1;    // 账户余额
-    int64 deposite      = 2;    // 冻结金额
+    uint64 balance      = 1;    // 账户余额
+    uint64 deposite     = 2;    // 冻结金额
     string unit         = 3;    // 余额单位
-    reserved diamond    = 4;    // 钻石数量 // 没用
+    uint64 diamond    = 4;    // 钻石数量 // 没用
 }
 
 
 message UserInfoExt {
-    
+    uint64 reserved     = 1;
 }
 
 
 message GameInfo {
-
+    uint64 reserved     = 1;
 }
 
 
 message TableInfo {
-
+    uint64 reserved     = 1;
 }
