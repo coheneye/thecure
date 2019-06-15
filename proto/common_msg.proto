@@ -1,31 +1,46 @@
 syntax = "proto3";
 
-package common.msg;
 
-import "google/protobuf/any.proto";
+// import "google/protobuf/any.proto";
 
 // Define message frame
 
-message MsgHeader{
-    int32 status    = 1;
-    int64 user_id   = 2;
-    int64 logic_id  = 3;
-    int32 room_id   = 4;
-    int32 table_id  = 5;
-    int32 agent_id  = 6;
-    int64 ses_id    = 7;
+
+// rpc router using
+message I_Router {
+    uint32 user_id  = 1;
+    uint32 agent_id = 2;
 }
 
 
-message Request {
-    int32 msg_id                = 1;
-    MsgHeader header            = 2;
-    google.protobuf.Any req     = 3;
+message C_Request {
+    fixed32 len          = 1;
+    uint32  msg_id       = 2;
+    uint64  logic_id     = 3;     // 用于特殊情况下指定请求的逻辑ID
+    string  req          = 10;    // 请求体
 }
 
 
-message Response {
-    int32 msg_id                = 1;
-    MsgHeader header            = 2;
-    google.protobuf.Any res     = 3;
+message S_Response {
+    fixed32 len         = 1;
+    int32   status      = 2;     // 状态
+    uint32  msg_id      = 3;
+    string  res         = 10;    // 响应体
+}
+
+
+message I_Heartbeat {
+    uint64 ts       = 1;
+    string reserved = 2;
+}
+
+
+// agent 到 login 专用心跳
+// 用于 login 对 agent load balance
+message L_Heartbeat {
+    uint32 cpu          = 1;
+    uint32 mem_total    = 2;
+    uint32 mem_free     = 3;
+    uint32 session_cnt  = 4;
+    uint32 ts           = 5;
 }

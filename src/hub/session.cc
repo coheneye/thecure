@@ -89,7 +89,7 @@ int ISession::start_read()
             
         }else if(read > 0){
             if(ses->m_disp){
-                ses->m_disp->dispatch(ses, buf->base, buf->len);
+                ses->m_disp->on_data_read(ses, buf->base, buf->len);
             }else{
                 //@log
             }

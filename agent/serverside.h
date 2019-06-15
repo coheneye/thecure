@@ -7,10 +7,14 @@
 
 class ServerDispatcher : public IDispatcher{
 public:
+    ServerDispatcher();
+    virtual ~ServerDispatcher();
+    
     virtual void dispatch(ISession* ses, char* data, int data_len);
 
 private:   
 };
+
 
 class CManager : public Manager{
 public:

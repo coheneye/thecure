@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package logic.redblack;
-
 
 // Messages transformed in redblack logic server 
 

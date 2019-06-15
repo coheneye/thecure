@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-package common.ec;
 
 // Defines all types of error codes here
 

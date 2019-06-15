@@ -1,7 +1,6 @@
-#include "exports.h"
-#include <utils/function.h>
-#include <utils/lua_manager.h>
-#include <utils/logger.h>
+#include "utils/logger.h"
+#include "utils/lua_manager.h"
+#include "utils/function.h"
 #include <utils/crypto.h>
 #include <utils/time.h>
 
@@ -152,15 +151,4 @@ void exports_utils(lua_State* L)
                 .addFunction("reset", &TimeCounter::reset)
             .endClass()
         .endNamespace();
-}
-
-
-bool exports(lua_State* L)
-{
-    exports_logger(L);
-    exports_hub(L);
-    exports_redis(L);
-    exports_utils(L);
-    
-    return true;
 }

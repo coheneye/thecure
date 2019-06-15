@@ -130,6 +130,10 @@ int AsyncRedis::reconnect()
 
 void AsyncRedis::close()
 {
+    if(!m_is_connected){
+        return;
+    }
+    
     gl_debug("closing redis");
 
     m_closing = true;

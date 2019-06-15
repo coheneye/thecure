@@ -2,6 +2,15 @@
 #include <iostream>
 
 
+ServerDispatcher::ServerDispatcher():IDispatcher()
+{
+
+}
+
+
+ServerDispatcher::~ServerDispatcher() = default;
+
+
 void ServerDispatcher::dispatch(ISession* ses, char* data, int data_len){
     std::cout << data << data_len << std::endl;
 }

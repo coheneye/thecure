@@ -1,12 +1,10 @@
 syntax = "proto3";
 
-package common.enums;
 
 // Defines all enums
 
 enum MsgId {
-    // check into game
-    // 统一定义方式为 大写 + 下划线
+    // 统一定义方式为 大写 + 下划线 的命名格式
     // C 代表客户端发起，MsgId 为 奇数
     // S 代表服务端返回，MsgId 必须为偶数
     // B 代表广播消息   MsgId 必须为偶数
@@ -23,34 +21,32 @@ enum MsgId {
     // 用户详情
     S_USERINFO      = 4;
 
-    // 服务支持的功能，用于生成大厅     
-    S_SUPPORTED     = 6;        
+    // 服务参数
+    S_SUPPORTED     = 6;
 
+    // 服务支持的功能，用于生成大厅   
+    S_HALLINFO      = 8;
     // 用户绑定手机/邮箱/支付宝/微信等等
-    C_BIND          = 7;
-    S_BIND          = 8;
-
-    // 其他绑定，比如绑定上级推广ID
-    C_BIND_G        = 201;
-    S_BIND_G        = 202;
+    C_BIND          = 11;
+    S_BIND          = 12;
 
     // 用户充值，一般不会使用本接口
-    C_RECHARGE      = 9;
-    S_RECHARGE      = 10;
+    C_RECHARGE      = 13;
+    S_RECHARGE      = 14;
 
     // 资产冻结
-    C_FREEZE        = 11;
-    S_FREEZE        = 12;
+    C_FREEZE        = 15;
+    S_FREEZE        = 16;
 
     // 资产解冻
-    C_THAW          = 13;
-    S_THAW          = 14;
+    C_THAW          = 17;
+    S_THAW          = 18;
 
     // 任务相关
-    C_TASK_ABOUT        = 15;
+    C_TASK_ABOUT    = 19;
     
     // 排行榜相关
-    C_BOARD_ABOUT       = 19;
+    C_BOARD_ABOUT   = 21;
 
     // 玩家加入某个房间，## 这个协议之后，直接可以开始某个游戏。
     C_JOIN          = 31;
@@ -77,6 +73,10 @@ enum MsgId {
     C_HANDSUP       = 71;   // 游戏中托管/取消
     S_HANDSUP       = 72;
     B_HANDSUP       = 74;
+
+    // 其他绑定，比如绑定上级推广ID
+    C_BIND_G        = 201;
+    S_BIND_G        = 202;
 }
 
 
@@ -88,9 +88,10 @@ enum TableStatus {
 
 
 enum UserStatus {
-    US_NORMAL   = 0;    // 正常
-    US_STAND    = 1;    // 所谓的观战
-    US_OFFLINE  = 2;    // 掉线，网络断开，客户端崩溃，意外的。
-    US_LEAVE    = 3;    // 离开，游戏中的离开，此时用户还在逻辑中，离开是指故意的离开，可能没掉线，也可能用户主分身在其他游戏逻辑里。
-    US_HOLD     = 4;    // 占座，VIP功能，占座的人就他妈在那个坐上。不参与游戏。
+    US_OUT      = 0;    //  不在游戏中，在大厅啊哪的
+    US_NORMAL   = 1;    // 正常
+    US_STAND    = 4;    // 所谓的观战
+    US_OFFLINE  = 6;    // 掉线，网络断开，客户端崩溃，意外的。
+    US_LEAVE    = 9;    // 离开，游戏中的离开，此时用户还在逻辑中，离开是指故意的离开，可能没掉线，也可能用户主分身在其他游戏逻辑里。
+    US_HOLD     = 10;    // 占座，VIP功能，占座的人就他妈在那个坐上。不参与游戏。
 }

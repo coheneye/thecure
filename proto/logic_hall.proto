@@ -1,16 +1,26 @@
 syntax = "proto3";
 
-package logic.hall;
-
 
 // Protocols transformed to hall server
 
 
+// C_CHECKIN_LOGIC 游戏服第一条消息
 message C_CheckinLogic {
-    string token    = 1;
-    uint32 user_id  = 2;
+    uint32  user_id  = 1;    //
+    string  token    = 2;    // 登录 token 
+    string  nonce    = 4;    //
+    string  sign     = 5;    //
 }
 
+
+// S_CHECKIN_LOGIC 游戏服第一条响应
 message S_CheckinLogic {
-    uint32 reserved = 1;
+    uint32  z       = 1;    // 压缩算法
+    uint32  c       = 2;    // 加密算法
+    uint32  alive   = 3;    // 存活时长(s)，在时长之内，不需要重新登录
+    uint32  tz      = 4;    // timezone
+    uint32  ts      = 5;    // 时间
+    uint32  lang    = 6;    // language
+    uint64  mul     = 7;    // 金币显示和内部表示的转换倍率
+    UserInfo  user  = 10;   //
 }

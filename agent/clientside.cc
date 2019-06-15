@@ -1,11 +1,21 @@
 #include "clientside.h"
 #include <iostream>
 #include <utils/function.h>
+#include <utils/logger.h>
+
+
+ClientDispatcher::ClientDispatcher():IDispatcher()
+{
+
+}
+
+
+ClientDispatcher::~ClientDispatcher() = default;
 
 
 void ClientDispatcher::dispatch(ISession* ses, char* data, int data_len)
 {
-    std::cout << data << data_len << std::endl;
+   
 }
 
 

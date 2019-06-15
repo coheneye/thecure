@@ -1,18 +1,35 @@
 syntax = "proto3";
 
-package logic.structs;
 
 // Defines structs
 
 
-message UserInfo {
-    uint32 user_id      = 1;
-    string username     = 2;
-    string nickname     = 3;
-    string passwd_hashed = 4;
-    string header       = 5;
-    string geo          = 6;
-    string remote       = 7;
+// 用户装饰
+message Decorations {
+    uint32  where       = 1;    // 使用场合
+    uint32  what        = 2;    // 物品
+    uint64  amount      = 3;    // 数量
+    uint32  expires     = 4;    // 剩余时长
+    uint32  status      = 5;    // 使用状态
+}
+
+
+message Mail {
+    uint32  sender_id   = 1;
+    string  sender      = 2;    // 发送者
+    uint32  ts          = 3;    // timestamp
+    string  subject     = 4;    // 主题
+    string  content     = 5;    //
+    string  attached    = 6;    // 附件
+    bool    read        = 7;    // 已读
+}
+
+
+message Vip {
+    uint32  rating      = 1;    // VIP 等级
+    uint32  type        = 2;    // 升级类型
+    uint32  remain      = 3;    // 距离下次升级差多少
+    uint32  expires     = 4;    // 距离失去 vip 时长
 }
 
 
@@ -20,20 +37,37 @@ message UserFortune {
     uint64 balance      = 1;    // 账户余额
     uint64 deposite     = 2;    // 冻结金额
     string unit         = 3;    // 余额单位
-    uint64 diamond    = 4;    // 钻石数量 // 没用
+    uint64 diamond      = 4;    // 钻石数量 // 没用
 }
 
 
-message UserInfoExt {
-    uint64 reserved     = 1;
+message UserInfo {
+    uint32  id              = 1;
+    string  name            = 2;
+    string  nickname        = 3;
+    uint32  level           = 4;
+    string  header          = 5;    // 头像，url/图片编码数据/头像代码(转整型)
+    string  geo             = 6;
+    string  remote          = 7;
+    repeated Decorations decos = 9;
+    string  email           = 10;
+    string  card            = 11;   // 银行卡
+    string  phone           = 12;   
+    string  we              = 13;   // 微信
+    string  tb              = 14;   // 淘宝 // 避免在代码中出先需要替换的单词
+    UserFortune fortune     = 10;
+    uint32  last_seen       = 20;   // 上次登录(客户端可根据此选择弹验证)
 }
 
 
-message GameInfo {
-    uint64 reserved     = 1;
+message LogicInfo {
+    uint64 logic_id     = 1;
 }
 
 
 message TableInfo {
-    uint64 reserved     = 1;
+    uint64  logic_id     = 1;
+    uint32  room_id      = 2;
+    uint32  table_id     = 3;
+    uint32  seat_num     = 4;
 }
