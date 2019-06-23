@@ -6,7 +6,7 @@
 /thecure
     -- settings
         --tax:5
-        --mul: 100,000,000
+        --mul: 100,000,000  // 
         --logics
             -- 20101 : {"name":"ddz", "lowest":30, "highest":100, "unit":1,
                    "rooms":3, "tables_per_room":100, "tax":5} [persist]
@@ -14,13 +14,13 @@
         -- 20301 [ephemeral]
 
     -- mysqls:
-        -- 1: {} [persist]
+        -- [{}] [persist]
 
     -- nats
-        -- 1: {} [persist]
+        -- [{}] [persist]
 
     -- redis : 
-        -- 1: {"ip":"192.168.0.33", "port":6333, "requirePass":"abc"} [persist]
+        -- [{"ip":"192.168.0.33", "port":6333, "auth":"abc"}] [persist]
 
     -- logins
         -- 1: {"ip":"192.168.0.2", "port":2183} [persist]

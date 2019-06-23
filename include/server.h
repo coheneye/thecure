@@ -7,6 +7,7 @@
 #include "hub/manager.h"
 #include "hub/redis.h"
 #include "hub/signal.h"
+#include "utils/zk_cpp.h"
 
 
 class Server {
@@ -28,12 +29,15 @@ public:
     virtual Manager* create_manager();
 
 protected:
+    int connect_to_redis();
+    int connect_to_zk();
 
     int32_t m_id;
     Hub m_hub;
     Signal m_signal;
     Manager* m_manager;
     AsyncRedis m_redis;
+    utility::zk_cpp m_zk;
 };
 
 

@@ -1,15 +1,22 @@
 #include "server.h"
 #include <signal.h>
+#include <cjson/cJSON.h>
 
 #include "utils/logger.h"
 #include "utils/lua_manager.h"
 #include "utils/function.h"
 
 
+// implements in std_export.cc
 void exports_logger(lua_State* L);
 void exports_hub(lua_State* L);
 void exports_redis(lua_State* L);
 void exports_utils(lua_State* L);
+
+typedef struct _conf {
+    std::string host, auth;
+    int port;   
+} conf_t ;
 
 
 Server::Server():m_redis(&m_hub), m_signal(&m_hub)
@@ -42,37 +49,16 @@ int Server::init()
     luabridge::LuaRef tc = luabridge::getGlobal(LL, "tc");
     tc["hub"] = &m_hub;
     tc["redis"] = &m_redis;
+    tc["zk"] = &m_zk;
 
     LuaManager::get_inst()->do_file(this->get_lua_file().c_str());
-
-    // 根据 id 返回 redis
-    luabridge::LuaRef fn_get_redis_conf = luabridge::getGlobal(LL, "get_redis_conf");
-    if(!fn_get_redis_conf.isFunction()){
-        gl_error("lua file no get_redis_conf().");
-        return -1;
+    int ec = this->connect_to_zk();
+    if(0 != ec){
+        return ec;
     }
-
-    luabridge::LuaRef redis_conf = fn_get_redis_conf(m_id);
-    if(!redis_conf.isTable()){
-        gl_error("redis_conf error.");
-        return -1;
-    }
-    std::string rds_host = redis_conf[1].cast<std::string>();
-    int rds_port = redis_conf[2].cast<int>();
-    
-
-    gl_trace(sf("redis host=%s, port=%d, auth=%d",
-        rds_host.c_str(), rds_port, !redis_conf[3].isNil()).c_str());
-
-    m_redis.connect(rds_host.c_str(), rds_port);
-    if(!redis_conf[3].isNil()){
-        std::string rds_auth = redis_conf[3].cast<std::string>();
-        m_redis.exec(sf("auth %s", rds_auth.c_str()).c_str(), nullptr);
-    }
-    
     // read redis address, connect
+    ec = this->connect_to_redis();
 
-    // read zookeeper address
     // 1, connect
     // 2, read all other server address and set watchers on them
     // 3, connect all servers 
@@ -131,6 +117,77 @@ bool Server::check_boot_params(int argc, char** argv)
     m_id = id;
 
     return true;
+}
+
+int Server::connect_to_redis()
+{
+    std::string js_redis_conf;
+    utility::zoo_rc rc = m_zk.get_node("/thecure/redis", js_redis_conf, nullptr, false);
+    if(utility::z_ok != rc){
+        gl_error("read redis conf from zk failed");
+        return rc;
+    }
+    cJSON* items = cJSON_Parse(js_redis_conf.c_str());
+    if(cJSON_IsInvalid(items) || !cJSON_IsArray(items)){
+        gl_error("there is no redis config");
+        return -1;
+    }
+    int size = cJSON_GetArraySize(items);
+    if(0 >= size){
+        gl_error("there is a blank redis config");
+        return -1;
+    }
+    // 1st
+    std::vector<conf_t> confs;
+    cJSON* item;
+    cJSON_ArrayForEach(item, items)
+    {
+        conf_t conf;
+        cJSON* host = cJSON_GetObjectItemCaseSensitive(item, "ip");
+        cJSON* port = cJSON_GetObjectItemCaseSensitive(item, "port");
+        cJSON* auth = cJSON_GetObjectItemCaseSensitive(item, "auth");
+        if(!cJSON_IsString(host) || !cJSON_IsNumber(port) || !cJSON_IsString(auth)){
+            return -1;
+        }
+        conf.host = host->valuestring;
+        conf.port = port->valueint;
+        conf.auth = host->valuestring;
+
+        confs.push_back(conf);
+    }
+
+    if(confs.size() > 0){
+        m_redis.connect(confs[0].host.c_str(), confs[0].port);
+        if(confs[0].auth.length() > 0){
+            m_redis.exec(sf("auth %s", confs[0].auth.c_str()).c_str(), nullptr);
+        }
+    }else{
+        gl_error("redis config error");
+        return -1;
+    }
+    return 0;
+}
+
+int Server::connect_to_zk()
+{
+    luabridge::LuaRef fn_get_zk_conf = luabridge::getGlobal(LL, "get_zk_conf");
+    if(!fn_get_zk_conf.isFunction()){
+        gl_error("lua file no get_zk_conf().");
+        return -1;
+    }
+    luabridge::LuaRef zk_conf = fn_get_zk_conf();
+    if(!zk_conf.isTable()){
+        gl_error("zk conf error.");
+        return -1;
+    }
+    std::string url = zk_conf[1].cast<std::string>();
+    utility::zoo_rc r = m_zk.connect(url);
+    if(r != utility::z_ok){
+        gl_error("zk connect error.");
+        return r;
+    }
+
+    return r;
 }
 
 Manager* Server::create_manager()
